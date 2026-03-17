@@ -53,8 +53,6 @@ Returns `{ "status": "ok" }`.
 
 Calculate the global income entitlement for a country (ISO 3166-1 alpha-2 code).
 
-**Example:**
-
 ```bash
 curl http://localhost:3333/v1/income/calc?country=NG
 ```
@@ -74,6 +72,22 @@ curl http://localhost:3333/v1/income/calc?country=NG
   }
 }
 ```
+
+### `GET /v1/income/rulesets`
+
+List all available rulesets with formula, parameters, and active status.
+
+### `GET /v1/income/countries`
+
+List all supported countries with income group and data availability.
+
+### `POST /v1/users`
+
+Register a user with a country code. Body: `{ "country_code": "DE" }`
+
+### `GET /v1/users/:id/income`
+
+Get a registered user's income entitlement.
 
 **49 countries available** across all World Bank income groups (HIC, UMC, LMC, LIC).
 
@@ -114,14 +128,14 @@ No TypeScript knowledge required — it's a plain JSON file with comments.
 ## Phases
 
 - [x] **Phase 1 (v0.0.1)** — Project scaffold, stub rules engine, dummy data
-- [x] **Phase 2 (v0.0.2)** — Real World Bank data, Ruleset v1, unit tests
-- [ ] **Phase 3 (v0.0.3)** — API expansion, rulesets endpoint, countries endpoint, error handling
+- [x] **Phase 2 (v0.0.2)** — Real World Bank data, Ruleset v1, data importer, unit tests
+- [x] **Phase 3 (v0.0.3)** — API expansion, rulesets endpoint, countries endpoint, user layer, error handling
 - [ ] **Phase 4 (v0.0.4)** — Documentation (ARCHITECTURE, RULESET, CONTRIBUTING), CI
 - [ ] **Phase 5 (v0.0.5)** — Currency/unit model, Solana adapter skeleton
 
 ## Current Status
 
-**Version 0.0.2** — Phase 2 (real data + Ruleset v1)
+**Version 0.0.3** — Phase 3 (expanded API + user layer + error handling)
 
 See [CHANGELOG.md](./CHANGELOG.md) for details.
 

@@ -4,19 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.0.3] - 2026-03-17
 
 ### Added
-- Automated World Bank data importer (`npm run data:update`)
-- Admin-editable `config.json` for all importer tunables (data sources, indicators, countries, income thresholds, output rounding)
-- Modular importer pipeline: config → fetch → transform → validate → write
-- Importer validates output before overwriting `countries.json` (same rules as test suite)
-- Unit tests for transformer, validator, and config validation (15 tests)
-- Retry with exponential backoff for World Bank API calls
-
-### Changed
-- Data version format now dynamic (e.g. `worldbank-2026` based on fetch year)
-- Loader test uses pattern match for data version instead of exact string
+- `GET /v1/income/rulesets` — list all rulesets with formula, parameters, and active status
+- `GET /v1/income/countries` — list all supported countries with income group and data availability
+- `POST /v1/users` — register a user with a `country_code`
+- `GET /v1/users/:id/income` — get a user's income entitlement
+- Global error handler with consistent JSON error responses
+- Custom 404 handler for unknown routes
+- Rulesets registry (`src/core/rulesets.ts`) — pure data, no HTTP
+- In-memory user store (`src/core/users.ts`) — Phase 3 placeholder
+- API integration tests using Fastify `.inject()` (16 tests)
 
 ## [0.0.2] - 2026-03-17
 
@@ -26,7 +25,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `gniPerCapitaUsd` and `incomeGroup` fields on `CountryStats`
 - `IncomeGroup` type (`HIC` | `UMC` | `LMC` | `LIC`)
 - World Bank data source documentation (`src/data/worldbank/README.md`)
-- Comprehensive unit tests for Ruleset v1 (10 tests) and data loader (6 tests)
+- Automated World Bank data importer (`npm run data:update`)
+- Admin-editable `config.json` for all importer tunables (data sources, indicators, countries, income thresholds, output rounding)
+- Modular importer pipeline: config → fetch → transform → validate → write
+- Importer validates output before overwriting `countries.json` (same rules as test suite)
+- Retry with exponential backoff for World Bank API calls
+- Comprehensive unit tests: Ruleset v1 (10), data loader (6), importer (22)
 - This CHANGELOG
 
 ### Changed
