@@ -18,7 +18,8 @@
     "format": "prettier --write 'src/**/*.ts'",
     "format:check": "prettier --check 'src/**/*.ts'",
     "data:update": "tsx src/data/worldbank/importer.ts",
-    "db:migrate": "tsx src/db/migrate.ts"
+    "db:migrate": "tsx src/db/migrate.ts",
+    "sdk:generate": "tsx scripts/generate-sdk.ts"
   },
   "keywords": [
     "global-income",
