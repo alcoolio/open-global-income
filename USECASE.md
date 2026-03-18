@@ -122,15 +122,63 @@ curl "http://localhost:3333/v1/income/calc?country=KE"
 - A **score of 1.0** means the global floor exceeds Kenya's average monthly GNI — maximum relative need. This is typical for LMC and LIC countries.
 - The $210/month figure is derived from the World Bank upper-middle-income poverty line ($6.85/day in 2017 PPP). It is a **reference point**, not a policy recommendation — a ministry could adopt it directly, use it as a starting point, or scale it.
 
-### Step 4 — Back-of-envelope budget
+### Step 4 — Budget simulation
 
-Kenya's population is 54.03 million (available via `GET /v1/income/countries/KE`). The API does not expose a budget calculation, but the math is straightforward:
+Use the simulation endpoint to model the full program cost directly:
 
+```bash
+curl -X POST http://localhost:3333/v1/simulate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "country": "KE",
+    "coverage": 0.2,
+    "targetGroup": "all",
+    "durationMonths": 12,
+    "adjustments": { "floorOverride": null, "householdSize": null }
+  }'
 ```
-10,368 KES/month × 12 months × 54,030,000 people ≈ 6.72 trillion KES/year
+
+```json
+{
+  "ok": true,
+  "data": {
+    "country": { "code": "KE", "name": "Kenya", "population": 54030000 },
+    "simulation": {
+      "recipientCount": 10806000,
+      "coverageRate": 0.2,
+      "entitlementPerPerson": {
+        "pppUsdPerMonth": 210,
+        "localCurrencyPerMonth": 10367.7
+      },
+      "cost": {
+        "monthlyLocalCurrency": 112032886200,
+        "annualLocalCurrency": 1344394634400,
+        "annualPppUsd": 27231120000,
+        "asPercentOfGdp": 23.96
+      },
+      "meta": { "rulesetVersion": "v1", "dataVersion": "worldbank-2023" }
+    }
+  }
+}
 ```
 
-At market exchange rates (~130 KES/USD), that's roughly **$51.7 billion/year** for universal coverage — clearly illustrating why most programs target a subset of the population. A ministry would need to model coverage rates (e.g., bottom 20% only), age targeting, and phased rollout.
+Covering the **bottom quintile** (a common targeting approach) instead of a flat 20%:
+
+```bash
+curl -X POST http://localhost:3333/v1/simulate \
+  -H "Content-Type: application/json" \
+  -d '{"country":"KE","coverage":1.0,"targetGroup":"bottom_quintile","durationMonths":12,"adjustments":{"floorOverride":null,"householdSize":null}}'
+```
+
+To save a simulation for later reference:
+
+```bash
+curl -X POST http://localhost:3333/v1/simulations \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Kenya 20% coverage 2026","country":"KE","coverage":0.2,"targetGroup":"all","durationMonths":12,"adjustments":{"floorOverride":null,"householdSize":null}}'
+```
+
+Saved simulations can be listed (`GET /v1/simulations`), retrieved (`GET /v1/simulations/:id`), and deleted (`DELETE /v1/simulations/:id`). They also trigger the `simulation.created` webhook event.
 
 ### Step 5 — Subscribe to updates
 
@@ -150,8 +198,8 @@ Subscribe to `data.updated` and `ruleset.updated` events to receive HMAC-SHA256 
 | API authentication | Yes | API key auth with free/standard/premium tiers |
 | Audit logging | Yes | All API requests logged |
 | Event notifications | Yes | Webhooks with HMAC-SHA256 signatures |
-| Total budget estimate | No | Population is available but no budget simulation endpoint |
-| Coverage/targeting simulation | No | No sub-national, age, or income-bracket modeling |
+| Total budget estimate | Yes | `POST /v1/simulate` returns full cost breakdown |
+| Coverage/targeting simulation | Yes | `all` and `bottom_quintile` targeting presets supported |
 | Disbursement mechanism | No | Calculation only — no M-Pesa, bank, or blockchain integration |
 | Identity / deduplication | No | User model has no KYC or national ID integration |
 | Household size adjustment | No | Entitlement is per-person, flat |
@@ -183,6 +231,26 @@ curl -X POST http://localhost:3333/v1/income/batch \
 All three score 1.0 (maximum need). The score alone doesn't differentiate between LIC countries — the useful comparison is on **local currency amounts** (cost per person) and **population** (total program cost). Mozambique's high Gini (54.0) might also factor into the NGO's decision as an indicator of inequality.
 
 **Observation:** The current scoring model saturates at 1.0 for most LMC/LIC countries. Ruleset v2 (preview) aims to provide finer granularity within the high-need tier using HDI and urbanization factors.
+
+### Step 1b — Compare full program costs
+
+The batch endpoint compares per-person entitlements. To compare total **program costs** (including population scale) use the comparison simulation endpoint:
+
+```bash
+curl -X POST http://localhost:3333/v1/simulate/compare \
+  -H "Content-Type: application/json" \
+  -d '{"countries": ["MZ", "BI", "ET"], "coverage": 0.2, "durationMonths": 12}'
+```
+
+This returns results sorted by annual PPP-USD cost ascending, making it easy to identify which country is most cost-efficient for a given coverage rate. For example, Burundi (population 12.89M) will be much cheaper than Ethiopia (123.4M) at the same 20% coverage, even though per-person costs differ.
+
+Save the chosen simulation for future reference:
+
+```bash
+curl -X POST http://localhost:3333/v1/simulations \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Burundi 20% pilot scoping","country":"BI","coverage":0.2,"targetGroup":"all","durationMonths":12,"adjustments":{"floorOverride":null,"householdSize":null}}'
+```
 
 ### Step 2 — Model a pilot cohort
 
@@ -222,7 +290,6 @@ console.log(result.data.localCurrencyPerMonth); // 5565
 
 - **CSV/spreadsheet export** — for reports and grant proposals
 - **Sub-national data** — districts and provinces vary widely within a country
-- **Budget simulation** — coverage rate and targeting scenarios
 - **Disbursement integration** — M-Pesa, bank transfer, etc.
 - **Donor reporting** — structured reports beyond the audit log
 
@@ -276,13 +343,92 @@ const tokenAmount = evmAdapter.toTokenAmount(entitlement, {
 });
 ```
 
-### Step 3 — Subscribe to recalculation events
+### Step 3 — Run a budget simulation
 
-Register a webhook for `entitlement.calculated` events to trigger on-chain updates when data changes.
+Use the simulation engine to plan the distribution before committing funds:
 
-### Step 4 — What's missing for DAOs
+```bash
+curl -X POST http://localhost:3333/v1/simulate \
+  -H "Content-Type: application/json" \
+  -d '{"country":"NG","coverage":0.2,"targetGroup":"bottom_quintile","durationMonths":1,"adjustments":{"floorOverride":null,"householdSize":null}}'
+# → recipientCount: 8_600_000, monthlyPppUsd: ~1,806,000,000
+```
 
-- **API endpoint for token mapping** — adapters are libraries, not API endpoints; the DAO must import them
+### Step 4 — Register a disbursement channel
+
+Register the DAO's Solana USDC channel once:
+
+```bash
+curl -X POST http://localhost:3333/v1/disbursements/channels \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Solana USDC Global",
+    "type": "crypto",
+    "provider": "solana",
+    "config": { "rpcUrl": "https://api.mainnet-beta.solana.com" }
+  }'
+# → { "ok": true, "data": { "id": "ch_abc123", "provider": "solana", ... } }
+```
+
+### Step 5 — Create and approve a disbursement
+
+```bash
+# Create (status: draft)
+curl -X POST http://localhost:3333/v1/disbursements \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channelId": "ch_abc123",
+    "countryCode": "NG",
+    "recipientCount": 1000,
+    "amountPerRecipient": "210.00",
+    "totalAmount": "210000.00",
+    "currency": "USDC",
+    "simulationId": "sim_xyz"
+  }'
+# → { "data": { "id": "d_789", "status": "draft", ... } }
+
+# Approve (status: approved — triggers disbursement.approved webhook)
+curl -X POST http://localhost:3333/v1/disbursements/d_789/approve
+```
+
+### Step 6 — Submit to the payment provider
+
+```bash
+curl -X POST http://localhost:3333/v1/disbursements/d_789/submit
+# → {
+#     "data": {
+#       "disbursement": { "status": "completed", "completedAt": "..." },
+#       "result": {
+#         "externalId": "...",
+#         "status": "submitted",
+#         "payload": {
+#           "transactionPayload": {
+#             "type": "solana_usdc_transfer",
+#             "recipientCount": 1000,
+#             "amountPerRecipient": { "rawAmount": "210000000", "symbol": "USDC" },
+#             "totalRawAmount": "210000000000",
+#             "note": "Unsigned — sign with your treasury multisig before broadcasting."
+#           }
+#         }
+#       }
+#     }
+#   }
+```
+
+The platform returns **unsigned transaction data** — the DAO's multisig or treasury wallet signs and broadcasts. The platform never holds keys.
+
+### Step 7 — Track status and subscribe to events
+
+```bash
+# Audit log for this disbursement
+curl http://localhost:3333/v1/disbursements/d_789
+# → { "disbursement": { "status": "completed" }, "log": [created, submitted, confirmed] }
+```
+
+Register webhooks for `disbursement.created`, `disbursement.approved`, `disbursement.completed`, and `disbursement.failed` to integrate with your treasury dashboard.
+
+### Step 8 — What's still missing for full on-chain DAOs
+
 - **On-chain program** — no smart contract for storing entitlements or triggering distributions
 - **Wallet-based identity** — user model uses UUIDs, not wallet addresses
 - **Oracle integration** — exchange rates are static config, no live price feeds
@@ -292,20 +438,24 @@ Register a webhook for `entitlement.calculated` events to trigger on-chain updat
 
 ## Summary
 
-### What works today (v0.1.0)
+### What works today (v0.1.2)
 
 - Transparent, auditable entitlement calculation for **49 countries**
 - PPP-adjusted amounts in **local currency**
 - Need-based **score (0–1)** incorporating inequality via Gini index
 - **Batch endpoint** for comparing up to 50 countries at once
+- **Budget simulation** (`POST /v1/simulate`) — full cost breakdown with coverage and targeting presets
+- **Comparison simulation** (`POST /v1/simulate/compare`) — side-by-side cost comparison across countries
+- **Saved simulations** — CRUD API for persisting and retrieving simulation scenarios
 - **Country detail endpoint** with full economic stats and population
 - **Persistent user store** (SQLite default, PostgreSQL supported)
 - **API key authentication** with tiered rate limits
 - **Audit logging** of all API requests
-- **Webhooks** for event-driven integration (HMAC-SHA256 signed)
+- **Webhooks** for event-driven integration (HMAC-SHA256 signed), including `simulation.created`, `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`
+- **Disbursement system** — non-custodial payment preparation for Solana USDC, EVM USDC, and M-Pesa (stub) with approval workflow, full audit log, and status tracking
 - **Chain adapters** for Solana and EVM (Ethereum, Polygon, Arbitrum, Optimism, Base)
 - **TypeScript SDK** generated from OpenAPI spec
-- **Admin UI** for API key management and monitoring
+- **Admin UI** for API key management, monitoring, and simulation playground
 - **Prometheus metrics** for operational observability
 - **Ruleset v2 preview** with HDI and urbanization factors
 - **Versioned results** (ruleset + data) for reproducibility
@@ -315,8 +465,8 @@ Register a webhook for `entitlement.calculated` events to trigger on-chain updat
 
 Listed roughly by priority (unblocks the most scenarios first):
 
-1. **Budget simulation endpoint** — `GET /v1/income/simulate?country=KE&coverage=0.2` returning total cost, per-person amount, and population covered
-2. **Sub-national data** — regional income and cost-of-living differences within a country
+1. **Sub-national data** — regional income and cost-of-living differences within a country
+2. **Age-based targeting presets** — `children` and `elderly` groups (requires UN demographic data)
 3. **Market exchange rate conversion** — in addition to PPP conversion
 4. **Time series / projections** — historical data snapshots for trend analysis
 5. **Export formats** — CSV, PDF for policymakers and donors
@@ -324,7 +474,7 @@ Listed roughly by priority (unblocks the most scenarios first):
 7. **Wallet-based identity** — link users to wallet addresses for on-chain disbursement
 8. **Oracle integration** — live exchange rates for adapter calculations
 9. **KYC / identity verification** — integration with national ID or biometric systems
-10. **Disbursement adapters** — M-Pesa, bank transfer, stablecoin rails
+10. **Live M-Pesa integration** — replace the stub with real Safaricom B2C API calls
 
 ---
 

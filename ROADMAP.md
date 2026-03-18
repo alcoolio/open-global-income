@@ -135,7 +135,7 @@ New event: `simulation.created` — fired when a simulation is saved, so downstr
 
 ---
 
-## Phase 12: Disbursement Integration
+## Phase 12: Disbursement Integration — Complete ✅
 
 **Goal:** Connect the calculation layer to real payment rails. Answer: *"How does the money actually reach people?"*
 

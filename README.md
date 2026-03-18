@@ -132,6 +132,74 @@ Register a user with a country code. Body: `{ "country_code": "DE" }`
 
 Get a registered user's income entitlement.
 
+### `POST /v1/simulate`
+
+Run a budget simulation for a country. Returns full cost breakdown.
+
+```bash
+curl -X POST http://localhost:3333/v1/simulate \
+  -H "Content-Type: application/json" \
+  -d '{"country":"KE","coverage":0.2,"targetGroup":"all","durationMonths":12,"adjustments":{"floorOverride":null,"householdSize":null}}'
+```
+
+Body fields:
+- `country` — ISO 3166-1 alpha-2 code (required)
+- `coverage` — fraction of population to cover, 0–1 (required)
+- `targetGroup` — `"all"` or `"bottom_quintile"` (default `"all"`)
+- `durationMonths` — programme duration 1–120 (default `12`)
+- `adjustments.floorOverride` — override the $210 PPP-USD floor (optional)
+
+### `POST /v1/simulate/compare`
+
+Compare the same scenario across multiple countries, sorted by annual cost ascending. Body: `{ "countries": ["KE","MZ","BI"], "coverage": 0.2, "durationMonths": 12 }`. Max 20 countries.
+
+### `POST /v1/simulations`
+
+Save a simulation with an optional name. Body: same as `POST /v1/simulate` plus `"name"`.
+
+### `GET /v1/simulations`
+
+List saved simulations. Query params: `page`, `limit`.
+
+### `GET /v1/simulations/:id`
+
+Retrieve a saved simulation by ID.
+
+### `DELETE /v1/simulations/:id`
+
+Delete a saved simulation.
+
+### `GET /v1/disbursements/channels`
+
+List all active disbursement channels and available providers (solana, evm, safaricom).
+
+### `POST /v1/disbursements/channels`
+
+Register a new disbursement channel. Body: `{ "name", "type", "provider", "config", "countryCode?" }`.
+- `type`: `"mobile_money"` | `"bank_transfer"` | `"crypto"`
+- `provider`: `"solana"` | `"evm"` | `"safaricom"`
+- `config`: provider-specific config (validated before saving)
+
+### `POST /v1/disbursements`
+
+Create a disbursement in `draft` status. Body: `{ "channelId", "countryCode", "recipientCount", "amountPerRecipient", "totalAmount", "currency", "simulationId?" }`.
+
+### `POST /v1/disbursements/:id/approve`
+
+Approve a `draft` disbursement for processing. Sets status to `approved`.
+
+### `POST /v1/disbursements/:id/submit`
+
+Submit an `approved` disbursement to its payment provider. Sets status to `completed` (or `failed`). Response includes provider-specific transaction payload (unsigned tx data for crypto, mock receipt for M-Pesa stub).
+
+### `GET /v1/disbursements/:id`
+
+Get a disbursement's current status and full audit log.
+
+### `GET /v1/disbursements`
+
+List all disbursements (paginated). Query params: `page`, `limit`, `status`, `channelId`.
+
 ### `GET /metrics`
 
 Prometheus metrics endpoint (request counts, duration histograms, active connections, Node.js runtime metrics).
@@ -187,6 +255,7 @@ A server-rendered admin dashboard (no SPA framework — uses htmx for interactiv
 - **Dashboard** — country count, users, API keys, request stats
 - **API Key Management** — create and revoke keys with tier selection
 - **Audit Log** — recent API requests with live-refresh
+- **Simulate** — run budget simulations with live cost preview, compare countries, save/delete scenarios
 
 Access at `http://localhost:3333/admin`. Login with the password set in `ADMIN_PASSWORD`.
 
@@ -199,9 +268,19 @@ Adapters map a `GlobalIncomeEntitlement` (in PPP-USD/month) to a concrete token 
 
 See `src/adapters/types.ts` for the `ChainAdapter<TConfig>` interface.
 
+## Disbursement Providers
+
+The disbursement system is non-custodial — it calculates and prepares payment instructions but never holds or moves funds directly.
+
+| Provider | ID | Currency | Notes |
+|----------|-----|----------|-------|
+| Solana USDC | `solana` | USDC | Returns unsigned transaction payload for multisig signing |
+| EVM USDC | `evm` | USDC | Returns unsigned ERC-20 calldata for Ethereum/Polygon/Arbitrum/Optimism/Base |
+| M-Pesa (stub) | `safaricom` | KES | Validates config, logs intent — no live Safaricom connection |
+
 ## Webhooks
 
-Subscribe to events (`income.calculated`, `user.created`, `ruleset.updated`) and receive HMAC-SHA256 signed payloads at your endpoint. See `src/webhooks/` for the dispatcher and type definitions.
+Subscribe to events (`entitlement.calculated`, `user.created`, `api_key.created`, `api_key.revoked`, `data.updated`, `simulation.created`, `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`) and receive HMAC-SHA256 signed payloads at your endpoint. See `src/webhooks/` for the dispatcher and type definitions.
 
 ## TypeScript SDK
 
@@ -224,23 +303,23 @@ npm run db:migrate
 
 Set `DB_BACKEND=postgres` and `DATABASE_URL` to switch backends.
 
-## Vision
+## Phases
 
-Open Global Income aims to become the **shared infrastructure layer for universal basic income** — the neutral, auditable protocol that any government, NGO, or DAO can build on.
+- [x] **Phase 1 (v0.0.1)** — Project scaffold, stub rules engine, dummy data
+- [x] **Phase 2 (v0.0.2)** — Real World Bank data, Ruleset v1, unit tests
+- [x] **Phase 3 (v0.0.3)** — API expansion, rulesets endpoint, countries endpoint, error handling
+- [x] **Phase 4 (v0.0.4)** — Documentation ([ARCHITECTURE](./ARCHITECTURE.md), [RULESET_V1](./RULESET_V1.md), [USECASE](./USECASE.md), [CONTRIBUTING](./CONTRIBUTING.md)), CI
+- [x] **Phase 5 (v0.0.5)** — Currency/unit model, Solana adapter skeleton
+- [x] **Phase 6 (v0.0.6)** — Batch endpoint, OpenAPI/Swagger, security headers, CORS, rate limiting
+- [x] **Phase 7 (v0.0.7)** — PostgreSQL migrations, database adapter layer
+- [x] **Phase 8 (v0.0.8)** — Admin UI with htmx, session auth, API key management
+- [x] **Phase 9 (v0.0.9)** — EVM adapter, webhooks, SDK generation
+- [x] **Phase 10 (v0.1.0)** — Prometheus metrics, Ruleset v2 preview, governance, API stability
+- [x] **Phase 11 (v0.1.1)** — Budget simulation engine (cost modeling, targeting presets, comparison, saved simulations)
+- [x] **Phase 12 (v0.1.2)** — Disbursement integration (Solana USDC, EVM, M-Pesa stub, approval workflow)
+- [ ] **Phase 13** — Pilot dashboard (pilot lifecycle, disbursement tracking, donor reports)
 
-See [CLAUDE.md](./CLAUDE.md) for the full vision, from calculation layer to federation protocol.
-
-### Current: Calculation & Scoring (v0.1.0)
-
-Transparent entitlement calculation for 49 countries with PPP-adjusted amounts, need-based scoring, chain adapters, webhooks, admin UI, and API key management. 105 tests. API-stable.
-
-### Next: Simulation, Disbursement & Pilots
-
-Budget modeling with targeting presets and multi-country comparison. Payment rail integration (Solana USDC, EVM, mobile money). Operational pilot dashboards with donor reporting. See [ROADMAP.md](./ROADMAP.md) for technical details.
-
-### Future: Identity, Evidence & Federation
-
-Identity provider interfaces for government, NGO, and DAO contexts. Impact measurement with research-grade data exports. Sub-national cost-of-living adjustments. Multi-currency settlement. Cross-border entitlement portability. The open evidence base for basic income that the field needs but does not yet have.
+See [ROADMAP.md](./ROADMAP.md) for the full plan with data models, endpoints, and rationale.
 
 ## Contributing
 
@@ -252,7 +331,7 @@ See [GOVERNANCE.md](./GOVERNANCE.md) for the decision-making process, API stabil
 
 ## Current Status
 
-**Version 0.1.0** — First API-stable release. 105 tests across 8 test suites.
+**Version 0.1.2** — Disbursement Integration. 142 + ~35 tests across 13 test suites.
 
 See [CHANGELOG.md](./CHANGELOG.md) for full version history.
 

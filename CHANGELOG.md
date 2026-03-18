@@ -4,6 +4,64 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.2] - 2026-03-18
+
+### Added
+- **Disbursement data model** — 3 new database tables: `disbursement_channels`, `disbursements`, `disbursement_log` with full FK integrity and indexed queries
+- **`DisbursementProvider` interface** in `src/disbursements/types.ts` — `validateConfig`, `submit`, `checkStatus` contract for all providers
+- **Solana USDC provider** (`src/disbursements/providers/solana.ts`) — non-custodial; uses `solanaAdapter.toTokenAmount()` to compute USDC amounts and returns unsigned transaction payloads for multisig signing
+- **EVM USDC provider** (`src/disbursements/providers/evm.ts`) — generates unsigned ERC-20 transfer calldata for Ethereum, Polygon, Arbitrum, Optimism, and Base
+- **M-Pesa stub provider** (`src/disbursements/providers/mpesa.ts`) — validates Safaricom config shape, logs intent, returns mock transaction ID; enables full pipeline testing without live API credentials
+- **Provider registry** (`src/disbursements/providers/registry.ts`) — `getProvider(id)` / `listProviders()`
+- **7 new API endpoints:**
+  - `GET /v1/disbursements/channels` — list channels and available providers
+  - `POST /v1/disbursements/channels` — register channel (validates provider config)
+  - `POST /v1/disbursements` — create disbursement (status: `draft`)
+  - `POST /v1/disbursements/:id/approve` — approve for processing (status: `approved`)
+  - `POST /v1/disbursements/:id/submit` — submit to provider (status: `completed` or `failed`)
+  - `GET /v1/disbursements/:id` — get disbursement + audit log
+  - `GET /v1/disbursements` — paginated list filterable by `status` and `channelId`
+- **4 new webhook events:** `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`
+- **~35 new tests** — unit tests per provider (valid/invalid config, submit shape, checkStatus) and integration tests covering the full lifecycle (draft → approved → submitted → completed) plus error cases
+- `DisbursementChannel`, `Disbursement`, `DisbursementLogEntry` domain types in `src/core/types.ts`
+- `src/db/disbursements-db.ts` — CRUD helpers for all three disbursement tables
+
+### Changed
+- Version corrected on Phase 11 CHANGELOG entry (was incorrectly `0.2.0`, now `0.1.1`) — each phase bumps by `0.0.1`
+- `USECASE.md` Scenario C (DAO) updated with full disbursement flow (Steps 4–8) using the new API
+- `README.md` updated with disbursement endpoints, provider table, and updated webhook event list
+- Phase 12 marked complete in `ROADMAP.md` and `README.md`
+- OpenAPI spec version bumped to `0.1.2`
+
+## [0.1.1] - 2026-03-18
+
+### Added
+- **Budget simulation endpoint** `POST /v1/simulate` — returns full cost breakdown for a country and coverage scenario: recipient count, monthly/annual cost in local currency and PPP-USD, and cost as % of GDP
+- **Targeting presets** — `all` (entire population) and `bottom_quintile` (bottom 20% by income, approximated from existing Gini data)
+- **Floor override** — `adjustments.floorOverride` to replace the default $210 PPP-USD/month with a custom floor for scenario modeling
+- **Comparison simulation** `POST /v1/simulate/compare` — run the same scenario across up to 20 countries, sorted by annual PPP-USD cost ascending
+- **Saved simulations** — SQLite-backed persistence with full CRUD:
+  - `POST /v1/simulations` — run and save a simulation with an optional name
+  - `GET /v1/simulations` — paginated list
+  - `GET /v1/simulations/:id` — retrieve by ID
+  - `DELETE /v1/simulations/:id` — delete
+- **`simulation.created` webhook event** — fired when a simulation is saved, enabling downstream systems (e.g. donor dashboards) to react
+- **Admin UI simulation page** at `/admin/simulate`:
+  - Country dropdown, coverage percentage input, duration input, target group selector
+  - Live cost preview via htmx partial refresh (no page reload)
+  - Multi-country comparison table
+  - Save simulation with a name and delete saved simulations
+- `SimulationParameters`, `SimulationResult`, `SavedSimulation` types in `src/core/types.ts`
+- Pure `calculateSimulation()` function in `src/core/simulations.ts` (no I/O, fully testable)
+- `src/db/simulations-db.ts` — CRUD helpers for the `simulations` table
+- 16 unit tests for simulation math + 21 integration tests for all simulation endpoints (142 tests total)
+
+### Changed
+- `USECASE.md` — Step 4 of Scenario A now shows `POST /v1/simulate` with a full example response; Scenario B adds `POST /v1/simulate/compare` for NGO cost comparison
+- Summary tables in `USECASE.md` updated to reflect simulation capabilities now available
+- Admin nav updated with a **Simulate** link
+- Phase 11 marked complete in `README.md`
+
 ## [0.1.0] - 2026-03-18
 
 ### Added
