@@ -200,6 +200,30 @@ Get a disbursement's current status and full audit log.
 
 List all disbursements (paginated). Query params: `page`, `limit`, `status`, `channelId`.
 
+### `POST /v1/pilots`
+
+Create a pilot program linked to a simulation. Body: `{ "name", "countryCode", "simulationId?", "description?", "startDate?", "endDate?", "targetRecipients?" }`. Status starts at `planning`.
+
+### `GET /v1/pilots`
+
+List pilots (paginated). Query params: `page`, `limit`, `status`, `countryCode`.
+
+### `GET /v1/pilots/:id`
+
+Get a pilot with all linked disbursements.
+
+### `PATCH /v1/pilots/:id`
+
+Update pilot status, description, dates, or target recipients. Status transitions are validated: `planning → active/completed`, `active → paused/completed`, `paused → active/completed`, `completed` is terminal.
+
+### `POST /v1/pilots/:id/disbursements`
+
+Link an existing disbursement to a pilot. Body: `{ "disbursementId" }`.
+
+### `GET /v1/pilots/:id/report`
+
+Generate a structured JSON report with summary stats, disbursement list, and simulation variance analysis. Suitable for donor and auditor reporting.
+
 ### `GET /metrics`
 
 Prometheus metrics endpoint (request counts, duration histograms, active connections, Node.js runtime metrics).
@@ -256,6 +280,7 @@ A server-rendered admin dashboard (no SPA framework — uses htmx for interactiv
 - **API Key Management** — create and revoke keys with tier selection
 - **Audit Log** — recent API requests with live-refresh
 - **Simulate** — run budget simulations with live cost preview, compare countries, save/delete scenarios
+- **Pilots** — create and manage pilot programs, link disbursements, track status lifecycle, view summary cards and simulation variance
 
 Access at `http://localhost:3333/admin`. Login with the password set in `ADMIN_PASSWORD`.
 
@@ -280,7 +305,7 @@ The disbursement system is non-custodial — it calculates and prepares payment 
 
 ## Webhooks
 
-Subscribe to events (`entitlement.calculated`, `user.created`, `api_key.created`, `api_key.revoked`, `data.updated`, `simulation.created`, `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`) and receive HMAC-SHA256 signed payloads at your endpoint. See `src/webhooks/` for the dispatcher and type definitions.
+Subscribe to events (`entitlement.calculated`, `user.created`, `api_key.created`, `api_key.revoked`, `data.updated`, `simulation.created`, `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`, `pilot.created`, `pilot.status_changed`, `pilot.report_generated`) and receive HMAC-SHA256 signed payloads at your endpoint. See `src/webhooks/` for the dispatcher and type definitions.
 
 ## TypeScript SDK
 
@@ -317,7 +342,7 @@ Set `DB_BACKEND=postgres` and `DATABASE_URL` to switch backends.
 - [x] **Phase 10 (v0.1.0)** — Prometheus metrics, Ruleset v2 preview, governance, API stability
 - [x] **Phase 11 (v0.1.1)** — Budget simulation engine (cost modeling, targeting presets, comparison, saved simulations)
 - [x] **Phase 12 (v0.1.2)** — Disbursement integration (Solana USDC, EVM, M-Pesa stub, approval workflow)
-- [ ] **Phase 13** — Pilot dashboard (pilot lifecycle, disbursement tracking, donor reports)
+- [x] **Phase 13 (v0.1.3)** — Pilot dashboard (pilot lifecycle, disbursement tracking, donor reports)
 
 See [ROADMAP.md](./ROADMAP.md) for the full plan with data models, endpoints, and rationale.
 
@@ -331,7 +356,7 @@ See [GOVERNANCE.md](./GOVERNANCE.md) for the decision-making process, API stabil
 
 ## Current Status
 
-**Version 0.1.2** — Disbursement Integration. 142 + ~35 tests across 13 test suites.
+**Version 0.1.3** — Pilot Dashboard. 233 tests across 15 test suites.
 
 See [CHANGELOG.md](./CHANGELOG.md) for full version history.
 
