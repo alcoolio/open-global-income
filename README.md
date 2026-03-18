@@ -236,6 +236,11 @@ Set `DB_BACKEND=postgres` and `DATABASE_URL` to switch backends.
 - [x] **Phase 8 (v0.0.8)** — Admin UI with htmx, session auth, API key management
 - [x] **Phase 9 (v0.0.9)** — EVM adapter, webhooks, SDK generation
 - [x] **Phase 10 (v0.1.0)** — Prometheus metrics, Ruleset v2 preview, governance, API stability
+- [ ] **Phase 11** — Budget simulation engine (cost modeling, targeting presets, comparison)
+- [ ] **Phase 12** — Disbursement integration (Solana USDC, EVM, M-Pesa stub, approval workflow)
+- [ ] **Phase 13** — Pilot dashboard (pilot lifecycle, disbursement tracking, donor reports)
+
+See [ROADMAP.md](./ROADMAP.md) for the full plan with data models, endpoints, and rationale.
 
 ## Contributing
 
