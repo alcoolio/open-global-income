@@ -4,6 +4,9 @@ export const STUB_RULESET_VERSION = 'stub-v0.0.1';
 /** Identifies Ruleset v1, the first real formula */
 export const RULESET_V1_VERSION = 'v1';
 
+/** Identifies Ruleset v2 */
+export const RULESET_V2_VERSION = 'v2';
+
 /** Active ruleset version used by the API */
 export const RULESET_VERSION = RULESET_V1_VERSION;
 
@@ -25,3 +28,10 @@ export const GLOBAL_INCOME_FLOOR_PPP = 210;
  * At 0.15, a country with Gini=100 would add 0.15 to its raw score.
  */
 export const GINI_WEIGHT = 0.15;
+
+/**
+ * Ruleset v2 constants.
+ * v2 adds HDI (Human Development Index) as an additional factor.
+ */
+export const HDI_WEIGHT = 0.10;
+export const URBANIZATION_WEIGHT = 0.05;
