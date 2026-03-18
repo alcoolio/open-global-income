@@ -4,6 +4,49 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.0] - 2026-03-18
+
+### Added
+- **Prometheus metrics** at `/metrics` endpoint via `prom-client` (request count, duration histogram, active connections, Node.js runtime metrics)
+- **Ruleset v2 (preview)**: extended formula with HDI and urbanization factors, registered but not active
+- **GOVERNANCE.md**: governance model, decision-making process, API stability declaration
+- **API stability declaration** for all v1 endpoints and response formats
+
+### Changed
+- Version bumped to 0.1.0 — first API-stable release
+- Rulesets registry now includes 3 rulesets (v1 active, v2 preview, stub deprecated)
+
+## [0.0.9] - 2026-03-18
+
+### Added
+- **Solana adapter**: token amount conversion with configurable exchange rates and decimals
+- **EVM adapter**: Ethereum/L2 adapter with pre-configured chains (Ethereum, Polygon, Arbitrum, Optimism, Base)
+- `ChainAdapter<TConfig>` generic interface in `src/adapters/types.ts`
+- **Webhook system**: subscription management, HMAC-SHA256 signature verification, async dispatch
+- **SDK generation**: `npm run sdk:generate` produces a TypeScript client SDK (`sdk/client.ts`)
+- `OgiClient` class with type-safe methods for all API endpoints
+
+## [0.0.8] - 2026-03-18
+
+### Added
+- **Admin UI**: server-rendered dashboard using htmx (no SPA framework)
+- Feature-flagged behind `ENABLE_ADMIN=true` env var
+- Session-based authentication with `ADMIN_PASSWORD` env var
+- Dashboard page: countries, users, API keys, request stats
+- API key management page: create/revoke keys with tier selection
+- Audit log page with htmx live-refresh every 10 seconds
+- Login/logout flow with HttpOnly session cookies
+- `@fastify/formbody` for form POST parsing
+
+## [0.0.7] - 2026-03-18
+
+### Added
+- PostgreSQL migration schema (`src/db/migrations/001_initial.sql`, `002_add_request_quotas.sql`)
+- PostgreSQL adapter (`src/db/pg-adapter.ts`) with `DATABASE_URL` config
+- Migration runner script (`npm run db:migrate`)
+- `DB_BACKEND` env var to switch between `sqlite` and `postgres`
+- `data_snapshots` table for storing country data versions
+
 ## [0.0.6] - 2026-03-18
 
 ### Added

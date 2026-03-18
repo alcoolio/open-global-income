@@ -171,7 +171,7 @@ describe('GET /v1/income/rulesets', () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.ok).toBe(true);
-    expect(body.data.length).toBeGreaterThanOrEqual(2);
+    expect(body.data.length).toBeGreaterThanOrEqual(3);
 
     const active = body.data.find((r: { active: boolean }) => r.active);
     expect(active).toBeDefined();
@@ -448,6 +448,17 @@ describe('OpenAPI docs', () => {
     expect(spec.openapi).toMatch(/^3\./);
     expect(spec.info.title).toBe('Open Global Income API');
     expect(spec.info.version).toBe('0.1.0');
+  });
+});
+
+// --- Prometheus metrics ---
+
+describe('Prometheus metrics', () => {
+  it('serves metrics at /metrics', async () => {
+    const res = await app.inject({ method: 'GET', url: '/metrics' });
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toContain('ogi_http_requests_total');
+    expect(res.body).toContain('ogi_http_request_duration_seconds');
   });
 });
 

@@ -7,6 +7,7 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyFormBody from '@fastify/formbody';
 import { apiKeyAuth } from './middleware/api-key-auth.js';
 import { auditLog } from './middleware/audit-log.js';
+import { metricsMiddleware } from './middleware/metrics.js';
 import { healthRoute } from './routes/health.js';
 import { incomeRoute } from './routes/income.js';
 import { rulesetsRoute } from './routes/rulesets.js';
@@ -136,6 +137,11 @@ export function buildServer(opts?: ServerOptions) {
       },
     });
   });
+
+  // Prometheus metrics
+  if (process.env.ENABLE_METRICS !== 'false') {
+    app.register(metricsMiddleware);
+  }
 
   // API key authentication (before routes)
   app.register(apiKeyAuth);

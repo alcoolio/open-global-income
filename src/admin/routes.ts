@@ -108,7 +108,7 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
     return reply.redirect(`/admin/api-keys?flash=Key+created:+${encodeURIComponent(rawKey)}`);
   });
 
-  app.post<{ Params: { id: string } }>('/:id/revoke', { url: '/api-keys/:id/revoke' }, async (request, reply) => {
+  app.post<{ Params: { id: string } }>('/api-keys/:id/revoke', async (request, reply) => {
     revokeApiKey(request.params.id);
     return reply.redirect('/admin/api-keys?flash=Key+revoked');
   });

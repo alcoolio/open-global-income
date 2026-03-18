@@ -1,9 +1,12 @@
 import type { RulesetInfo } from './types.js';
 import {
   RULESET_V1_VERSION,
+  RULESET_V2_VERSION,
   STUB_RULESET_VERSION,
   GLOBAL_INCOME_FLOOR_PPP,
   GINI_WEIGHT,
+  HDI_WEIGHT,
+  URBANIZATION_WEIGHT,
 } from './constants.js';
 
 /**
@@ -28,6 +31,29 @@ export const RULESETS: RulesetInfo[] = [
       'incomeRatio = pppUsdPerMonth / (gniPerCapitaUsd / 12); ' +
       'giniPenalty = (giniIndex / 100) × GINI_WEIGHT; ' +
       'score = clamp(incomeRatio + giniPenalty, 0, 1)',
+  },
+  {
+    version: RULESET_V2_VERSION,
+    name: 'Ruleset v2 (preview)',
+    description:
+      'Extended formula adding HDI (Human Development Index) and urbanization factors. ' +
+      'Designed for multi-source data from World Bank, IMF, and UNDP. ' +
+      'Preview — not yet the default active ruleset.',
+    active: false,
+    parameters: {
+      globalIncomeFloorPpp: GLOBAL_INCOME_FLOOR_PPP,
+      giniWeight: GINI_WEIGHT,
+      hdiWeight: HDI_WEIGHT,
+      urbanizationWeight: URBANIZATION_WEIGHT,
+    },
+    formula:
+      'pppUsdPerMonth = GLOBAL_INCOME_FLOOR_PPP; ' +
+      'localCurrencyPerMonth = pppUsdPerMonth × pppConversionFactor; ' +
+      'incomeRatio = pppUsdPerMonth / (gniPerCapitaUsd / 12); ' +
+      'giniPenalty = (giniIndex / 100) × GINI_WEIGHT; ' +
+      'hdiAdjustment = (1 - hdi) × HDI_WEIGHT; ' +
+      'urbanPenalty = (1 - urbanizationRate) × URBANIZATION_WEIGHT; ' +
+      'score = clamp(incomeRatio + giniPenalty + hdiAdjustment + urbanPenalty, 0, 1)',
   },
   {
     version: STUB_RULESET_VERSION,
