@@ -224,23 +224,23 @@ npm run db:migrate
 
 Set `DB_BACKEND=postgres` and `DATABASE_URL` to switch backends.
 
-## Phases
+## Vision
 
-- [x] **Phase 1 (v0.0.1)** — Project scaffold, stub rules engine, dummy data
-- [x] **Phase 2 (v0.0.2)** — Real World Bank data, Ruleset v1, unit tests
-- [x] **Phase 3 (v0.0.3)** — API expansion, rulesets endpoint, countries endpoint, error handling
-- [x] **Phase 4 (v0.0.4)** — Documentation ([ARCHITECTURE](./ARCHITECTURE.md), [RULESET_V1](./RULESET_V1.md), [USECASE](./USECASE.md), [CONTRIBUTING](./CONTRIBUTING.md)), CI
-- [x] **Phase 5 (v0.0.5)** — Currency/unit model, Solana adapter skeleton
-- [x] **Phase 6 (v0.0.6)** — Batch endpoint, OpenAPI/Swagger, security headers, CORS, rate limiting
-- [x] **Phase 7 (v0.0.7)** — PostgreSQL migrations, database adapter layer
-- [x] **Phase 8 (v0.0.8)** — Admin UI with htmx, session auth, API key management
-- [x] **Phase 9 (v0.0.9)** — EVM adapter, webhooks, SDK generation
-- [x] **Phase 10 (v0.1.0)** — Prometheus metrics, Ruleset v2 preview, governance, API stability
-- [ ] **Phase 11** — Budget simulation engine (cost modeling, targeting presets, comparison)
-- [ ] **Phase 12** — Disbursement integration (Solana USDC, EVM, M-Pesa stub, approval workflow)
-- [ ] **Phase 13** — Pilot dashboard (pilot lifecycle, disbursement tracking, donor reports)
+Open Global Income aims to become the **shared infrastructure layer for universal basic income** — the neutral, auditable protocol that any government, NGO, or DAO can build on.
 
-See [ROADMAP.md](./ROADMAP.md) for the full plan with data models, endpoints, and rationale.
+See [CLAUDE.md](./CLAUDE.md) for the full vision, from calculation layer to federation protocol.
+
+### Current: Calculation & Scoring (v0.1.0)
+
+Transparent entitlement calculation for 49 countries with PPP-adjusted amounts, need-based scoring, chain adapters, webhooks, admin UI, and API key management. 105 tests. API-stable.
+
+### Next: Simulation, Disbursement & Pilots
+
+Budget modeling with targeting presets and multi-country comparison. Payment rail integration (Solana USDC, EVM, mobile money). Operational pilot dashboards with donor reporting. See [ROADMAP.md](./ROADMAP.md) for technical details.
+
+### Future: Identity, Evidence & Federation
+
+Identity provider interfaces for government, NGO, and DAO contexts. Impact measurement with research-grade data exports. Sub-national cost-of-living adjustments. Multi-currency settlement. Cross-border entitlement portability. The open evidence base for basic income that the field needs but does not yet have.
 
 ## Contributing
 
