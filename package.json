@@ -17,7 +17,8 @@
     "lint:fix": "eslint src/ --fix",
     "format": "prettier --write 'src/**/*.ts'",
     "format:check": "prettier --check 'src/**/*.ts'",
-    "data:update": "tsx src/data/worldbank/importer.ts"
+    "data:update": "tsx src/data/worldbank/importer.ts",
+    "db:migrate": "tsx src/db/migrate.ts"
   },
   "keywords": [
     "global-income",
