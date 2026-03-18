@@ -16,7 +16,27 @@ export interface ServerOptions {
 }
 
 export function buildServer(opts?: ServerOptions) {
-  const app = Fastify({ logger: true });
+  const logLevel = process.env.LOG_LEVEL ?? 'info';
+  const app = Fastify({
+    logger: {
+      level: logLevel,
+      serializers: {
+        req(request) {
+          return {
+            method: request.method,
+            url: request.url,
+            host: request.hostname,
+            remoteAddress: request.ip,
+          };
+        },
+        res(reply) {
+          return {
+            statusCode: reply.statusCode,
+          };
+        },
+      },
+    },
+  });
 
   // Security headers
   app.register(fastifyHelmet);
@@ -48,7 +68,7 @@ export function buildServer(opts?: ServerOptions) {
         title: 'Open Global Income API',
         description:
           'Open standard and reference implementation for a global income entitlement calculation model',
-        version: '0.0.3',
+        version: '0.1.0',
       },
       servers: [{ url: '/' }],
     },
