@@ -328,4 +328,6 @@ Listed roughly by priority (unblocks the most scenarios first):
 
 ---
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) to help close these gaps.
+See [ROADMAP.md](./ROADMAP.md) for the full plan to close these gaps (Phases 11–13).
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) to get involved.
