@@ -229,7 +229,7 @@ Set `DB_BACKEND=postgres` and `DATABASE_URL` to switch backends.
 - [x] **Phase 1 (v0.0.1)** — Project scaffold, stub rules engine, dummy data
 - [x] **Phase 2 (v0.0.2)** — Real World Bank data, Ruleset v1, unit tests
 - [x] **Phase 3 (v0.0.3)** — API expansion, rulesets endpoint, countries endpoint, error handling
-- [x] **Phase 4 (v0.0.4)** — Documentation ([ARCHITECTURE](./ARCHITECTURE.md), [RULESET_V1](./RULESET_V1.md), [CONTRIBUTING](./CONTRIBUTING.md)), CI
+- [x] **Phase 4 (v0.0.4)** — Documentation ([ARCHITECTURE](./ARCHITECTURE.md), [RULESET_V1](./RULESET_V1.md), [USECASE](./USECASE.md), [CONTRIBUTING](./CONTRIBUTING.md)), CI
 - [x] **Phase 5 (v0.0.5)** — Currency/unit model, Solana adapter skeleton
 - [x] **Phase 6 (v0.0.6)** — Batch endpoint, OpenAPI/Swagger, security headers, CORS, rate limiting
 - [x] **Phase 7 (v0.0.7)** — PostgreSQL migrations, database adapter layer
