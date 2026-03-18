@@ -118,3 +118,46 @@ export interface SavedSimulation {
   apiKeyId: string | null;
   createdAt: string;
 }
+
+// ── Disbursement types ────────────────────────────────────────────────────────
+
+export type DisbursementChannelType = 'mobile_money' | 'bank_transfer' | 'crypto';
+
+export type DisbursementStatus = 'draft' | 'approved' | 'processing' | 'completed' | 'failed';
+
+export type DisbursementLogEvent = 'created' | 'approved' | 'submitted' | 'confirmed' | 'failed';
+
+export interface DisbursementChannel {
+  id: string;
+  name: string;
+  type: DisbursementChannelType;
+  provider: string;
+  countryCode: string | null;
+  config: Record<string, unknown>;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface Disbursement {
+  id: string;
+  simulationId: string | null;
+  channelId: string;
+  countryCode: string;
+  recipientCount: number;
+  amountPerRecipient: string;
+  totalAmount: string;
+  currency: string;
+  status: DisbursementStatus;
+  createdAt: string;
+  approvedAt: string | null;
+  completedAt: string | null;
+  apiKeyId: string | null;
+}
+
+export interface DisbursementLogEntry {
+  id: number;
+  disbursementId: string;
+  event: DisbursementLogEvent;
+  details: Record<string, unknown> | null;
+  timestamp: string;
+}
