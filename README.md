@@ -169,6 +169,37 @@ Retrieve a saved simulation by ID.
 
 Delete a saved simulation.
 
+### `GET /v1/disbursements/channels`
+
+List all active disbursement channels and available providers (solana, evm, safaricom).
+
+### `POST /v1/disbursements/channels`
+
+Register a new disbursement channel. Body: `{ "name", "type", "provider", "config", "countryCode?" }`.
+- `type`: `"mobile_money"` | `"bank_transfer"` | `"crypto"`
+- `provider`: `"solana"` | `"evm"` | `"safaricom"`
+- `config`: provider-specific config (validated before saving)
+
+### `POST /v1/disbursements`
+
+Create a disbursement in `draft` status. Body: `{ "channelId", "countryCode", "recipientCount", "amountPerRecipient", "totalAmount", "currency", "simulationId?" }`.
+
+### `POST /v1/disbursements/:id/approve`
+
+Approve a `draft` disbursement for processing. Sets status to `approved`.
+
+### `POST /v1/disbursements/:id/submit`
+
+Submit an `approved` disbursement to its payment provider. Sets status to `completed` (or `failed`). Response includes provider-specific transaction payload (unsigned tx data for crypto, mock receipt for M-Pesa stub).
+
+### `GET /v1/disbursements/:id`
+
+Get a disbursement's current status and full audit log.
+
+### `GET /v1/disbursements`
+
+List all disbursements (paginated). Query params: `page`, `limit`, `status`, `channelId`.
+
 ### `GET /metrics`
 
 Prometheus metrics endpoint (request counts, duration histograms, active connections, Node.js runtime metrics).
@@ -237,9 +268,19 @@ Adapters map a `GlobalIncomeEntitlement` (in PPP-USD/month) to a concrete token 
 
 See `src/adapters/types.ts` for the `ChainAdapter<TConfig>` interface.
 
+## Disbursement Providers
+
+The disbursement system is non-custodial — it calculates and prepares payment instructions but never holds or moves funds directly.
+
+| Provider | ID | Currency | Notes |
+|----------|-----|----------|-------|
+| Solana USDC | `solana` | USDC | Returns unsigned transaction payload for multisig signing |
+| EVM USDC | `evm` | USDC | Returns unsigned ERC-20 calldata for Ethereum/Polygon/Arbitrum/Optimism/Base |
+| M-Pesa (stub) | `safaricom` | KES | Validates config, logs intent — no live Safaricom connection |
+
 ## Webhooks
 
-Subscribe to events (`entitlement.calculated`, `user.created`, `api_key.created`, `api_key.revoked`, `data.updated`, `simulation.created`) and receive HMAC-SHA256 signed payloads at your endpoint. See `src/webhooks/` for the dispatcher and type definitions.
+Subscribe to events (`entitlement.calculated`, `user.created`, `api_key.created`, `api_key.revoked`, `data.updated`, `simulation.created`, `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`) and receive HMAC-SHA256 signed payloads at your endpoint. See `src/webhooks/` for the dispatcher and type definitions.
 
 ## TypeScript SDK
 
@@ -274,8 +315,8 @@ Set `DB_BACKEND=postgres` and `DATABASE_URL` to switch backends.
 - [x] **Phase 8 (v0.0.8)** — Admin UI with htmx, session auth, API key management
 - [x] **Phase 9 (v0.0.9)** — EVM adapter, webhooks, SDK generation
 - [x] **Phase 10 (v0.1.0)** — Prometheus metrics, Ruleset v2 preview, governance, API stability
-- [x] **Phase 11 (v0.2.0)** — Budget simulation engine (cost modeling, targeting presets, comparison, saved simulations)
-- [ ] **Phase 12** — Disbursement integration (Solana USDC, EVM, M-Pesa stub, approval workflow)
+- [x] **Phase 11 (v0.1.1)** — Budget simulation engine (cost modeling, targeting presets, comparison, saved simulations)
+- [x] **Phase 12 (v0.1.2)** — Disbursement integration (Solana USDC, EVM, M-Pesa stub, approval workflow)
 - [ ] **Phase 13** — Pilot dashboard (pilot lifecycle, disbursement tracking, donor reports)
 
 See [ROADMAP.md](./ROADMAP.md) for the full plan with data models, endpoints, and rationale.
@@ -290,7 +331,7 @@ See [GOVERNANCE.md](./GOVERNANCE.md) for the decision-making process, API stabil
 
 ## Current Status
 
-**Version 0.2.0** — Budget Simulation Engine. 142 tests across 10 test suites.
+**Version 0.1.2** — Disbursement Integration. 142 + ~35 tests across 13 test suites.
 
 See [CHANGELOG.md](./CHANGELOG.md) for full version history.
 

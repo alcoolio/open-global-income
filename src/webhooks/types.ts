@@ -5,7 +5,11 @@ export type WebhookEvent =
   | 'data.updated'
   | 'api_key.created'
   | 'api_key.revoked'
-  | 'simulation.created';
+  | 'simulation.created'
+  | 'disbursement.created'
+  | 'disbursement.approved'
+  | 'disbursement.completed'
+  | 'disbursement.failed';
 
 /** Webhook subscription stored in the database */
 export interface WebhookSubscription {

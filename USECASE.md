@@ -343,13 +343,92 @@ const tokenAmount = evmAdapter.toTokenAmount(entitlement, {
 });
 ```
 
-### Step 3 — Subscribe to recalculation events
+### Step 3 — Run a budget simulation
 
-Register a webhook for `entitlement.calculated` events to trigger on-chain updates when data changes.
+Use the simulation engine to plan the distribution before committing funds:
 
-### Step 4 — What's missing for DAOs
+```bash
+curl -X POST http://localhost:3333/v1/simulate \
+  -H "Content-Type: application/json" \
+  -d '{"country":"NG","coverage":0.2,"targetGroup":"bottom_quintile","durationMonths":1,"adjustments":{"floorOverride":null,"householdSize":null}}'
+# → recipientCount: 8_600_000, monthlyPppUsd: ~1,806,000,000
+```
 
-- **API endpoint for token mapping** — adapters are libraries, not API endpoints; the DAO must import them
+### Step 4 — Register a disbursement channel
+
+Register the DAO's Solana USDC channel once:
+
+```bash
+curl -X POST http://localhost:3333/v1/disbursements/channels \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Solana USDC Global",
+    "type": "crypto",
+    "provider": "solana",
+    "config": { "rpcUrl": "https://api.mainnet-beta.solana.com" }
+  }'
+# → { "ok": true, "data": { "id": "ch_abc123", "provider": "solana", ... } }
+```
+
+### Step 5 — Create and approve a disbursement
+
+```bash
+# Create (status: draft)
+curl -X POST http://localhost:3333/v1/disbursements \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channelId": "ch_abc123",
+    "countryCode": "NG",
+    "recipientCount": 1000,
+    "amountPerRecipient": "210.00",
+    "totalAmount": "210000.00",
+    "currency": "USDC",
+    "simulationId": "sim_xyz"
+  }'
+# → { "data": { "id": "d_789", "status": "draft", ... } }
+
+# Approve (status: approved — triggers disbursement.approved webhook)
+curl -X POST http://localhost:3333/v1/disbursements/d_789/approve
+```
+
+### Step 6 — Submit to the payment provider
+
+```bash
+curl -X POST http://localhost:3333/v1/disbursements/d_789/submit
+# → {
+#     "data": {
+#       "disbursement": { "status": "completed", "completedAt": "..." },
+#       "result": {
+#         "externalId": "...",
+#         "status": "submitted",
+#         "payload": {
+#           "transactionPayload": {
+#             "type": "solana_usdc_transfer",
+#             "recipientCount": 1000,
+#             "amountPerRecipient": { "rawAmount": "210000000", "symbol": "USDC" },
+#             "totalRawAmount": "210000000000",
+#             "note": "Unsigned — sign with your treasury multisig before broadcasting."
+#           }
+#         }
+#       }
+#     }
+#   }
+```
+
+The platform returns **unsigned transaction data** — the DAO's multisig or treasury wallet signs and broadcasts. The platform never holds keys.
+
+### Step 7 — Track status and subscribe to events
+
+```bash
+# Audit log for this disbursement
+curl http://localhost:3333/v1/disbursements/d_789
+# → { "disbursement": { "status": "completed" }, "log": [created, submitted, confirmed] }
+```
+
+Register webhooks for `disbursement.created`, `disbursement.approved`, `disbursement.completed`, and `disbursement.failed` to integrate with your treasury dashboard.
+
+### Step 8 — What's still missing for full on-chain DAOs
+
 - **On-chain program** — no smart contract for storing entitlements or triggering distributions
 - **Wallet-based identity** — user model uses UUIDs, not wallet addresses
 - **Oracle integration** — exchange rates are static config, no live price feeds
@@ -359,7 +438,7 @@ Register a webhook for `entitlement.calculated` events to trigger on-chain updat
 
 ## Summary
 
-### What works today (v0.1.0)
+### What works today (v0.1.2)
 
 - Transparent, auditable entitlement calculation for **49 countries**
 - PPP-adjusted amounts in **local currency**
@@ -372,7 +451,8 @@ Register a webhook for `entitlement.calculated` events to trigger on-chain updat
 - **Persistent user store** (SQLite default, PostgreSQL supported)
 - **API key authentication** with tiered rate limits
 - **Audit logging** of all API requests
-- **Webhooks** for event-driven integration (HMAC-SHA256 signed), including `simulation.created`
+- **Webhooks** for event-driven integration (HMAC-SHA256 signed), including `simulation.created`, `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`
+- **Disbursement system** — non-custodial payment preparation for Solana USDC, EVM USDC, and M-Pesa (stub) with approval workflow, full audit log, and status tracking
 - **Chain adapters** for Solana and EVM (Ethereum, Polygon, Arbitrum, Optimism, Base)
 - **TypeScript SDK** generated from OpenAPI spec
 - **Admin UI** for API key management, monitoring, and simulation playground
@@ -394,7 +474,7 @@ Listed roughly by priority (unblocks the most scenarios first):
 7. **Wallet-based identity** — link users to wallet addresses for on-chain disbursement
 8. **Oracle integration** — live exchange rates for adapter calculations
 9. **KYC / identity verification** — integration with national ID or biometric systems
-10. **Disbursement adapters** — M-Pesa, bank transfer, stablecoin rails
+10. **Live M-Pesa integration** — replace the stub with real Safaricom B2C API calls
 
 ---
 

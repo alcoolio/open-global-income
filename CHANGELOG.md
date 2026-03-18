@@ -4,7 +4,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.2.0] - 2026-03-18
+## [0.1.2] - 2026-03-18
+
+### Added
+- **Disbursement data model** — 3 new database tables: `disbursement_channels`, `disbursements`, `disbursement_log` with full FK integrity and indexed queries
+- **`DisbursementProvider` interface** in `src/disbursements/types.ts` — `validateConfig`, `submit`, `checkStatus` contract for all providers
+- **Solana USDC provider** (`src/disbursements/providers/solana.ts`) — non-custodial; uses `solanaAdapter.toTokenAmount()` to compute USDC amounts and returns unsigned transaction payloads for multisig signing
+- **EVM USDC provider** (`src/disbursements/providers/evm.ts`) — generates unsigned ERC-20 transfer calldata for Ethereum, Polygon, Arbitrum, Optimism, and Base
+- **M-Pesa stub provider** (`src/disbursements/providers/mpesa.ts`) — validates Safaricom config shape, logs intent, returns mock transaction ID; enables full pipeline testing without live API credentials
+- **Provider registry** (`src/disbursements/providers/registry.ts`) — `getProvider(id)` / `listProviders()`
+- **7 new API endpoints:**
+  - `GET /v1/disbursements/channels` — list channels and available providers
+  - `POST /v1/disbursements/channels` — register channel (validates provider config)
+  - `POST /v1/disbursements` — create disbursement (status: `draft`)
+  - `POST /v1/disbursements/:id/approve` — approve for processing (status: `approved`)
+  - `POST /v1/disbursements/:id/submit` — submit to provider (status: `completed` or `failed`)
+  - `GET /v1/disbursements/:id` — get disbursement + audit log
+  - `GET /v1/disbursements` — paginated list filterable by `status` and `channelId`
+- **4 new webhook events:** `disbursement.created`, `disbursement.approved`, `disbursement.completed`, `disbursement.failed`
+- **~35 new tests** — unit tests per provider (valid/invalid config, submit shape, checkStatus) and integration tests covering the full lifecycle (draft → approved → submitted → completed) plus error cases
+- `DisbursementChannel`, `Disbursement`, `DisbursementLogEntry` domain types in `src/core/types.ts`
+- `src/db/disbursements-db.ts` — CRUD helpers for all three disbursement tables
+
+### Changed
+- Version corrected on Phase 11 CHANGELOG entry (was incorrectly `0.2.0`, now `0.1.1`) — each phase bumps by `0.0.1`
+- `USECASE.md` Scenario C (DAO) updated with full disbursement flow (Steps 4–8) using the new API
+- `README.md` updated with disbursement endpoints, provider table, and updated webhook event list
+- Phase 12 marked complete in `ROADMAP.md` and `README.md`
+- OpenAPI spec version bumped to `0.1.2`
+
+## [0.1.1] - 2026-03-18
 
 ### Added
 - **Budget simulation endpoint** `POST /v1/simulate` — returns full cost breakdown for a country and coverage scenario: recipient count, monthly/annual cost in local currency and PPP-USD, and cost as % of GDP

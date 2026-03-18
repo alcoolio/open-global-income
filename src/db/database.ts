@@ -51,6 +51,50 @@ const SCHEMA = `
 
   CREATE INDEX IF NOT EXISTS idx_simulations_country ON simulations(country_code);
   CREATE INDEX IF NOT EXISTS idx_simulations_api_key ON simulations(api_key_id);
+
+  CREATE TABLE IF NOT EXISTS disbursement_channels (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('mobile_money', 'bank_transfer', 'crypto')),
+    provider TEXT NOT NULL,
+    country_code TEXT,
+    config TEXT NOT NULL,
+    active INTEGER DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS disbursements (
+    id TEXT PRIMARY KEY,
+    simulation_id TEXT,
+    channel_id TEXT NOT NULL,
+    country_code TEXT NOT NULL,
+    recipient_count INTEGER NOT NULL,
+    amount_per_recipient TEXT NOT NULL,
+    total_amount TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'draft'
+      CHECK(status IN ('draft','approved','processing','completed','failed')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    approved_at TEXT,
+    completed_at TEXT,
+    api_key_id TEXT,
+    FOREIGN KEY (channel_id) REFERENCES disbursement_channels(id),
+    FOREIGN KEY (simulation_id) REFERENCES simulations(id),
+    FOREIGN KEY (api_key_id) REFERENCES api_keys(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS disbursement_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    disbursement_id TEXT NOT NULL,
+    event TEXT NOT NULL,
+    details TEXT,
+    timestamp TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (disbursement_id) REFERENCES disbursements(id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_disbursements_status ON disbursements(status);
+  CREATE INDEX IF NOT EXISTS idx_disbursements_channel ON disbursements(channel_id);
+  CREATE INDEX IF NOT EXISTS idx_disbursement_log_id ON disbursement_log(disbursement_id);
 `;
 
 export function getDb(dbPath?: string): Database.Database {
