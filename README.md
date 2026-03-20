@@ -38,20 +38,20 @@ Open Global Income is a stack. Each layer builds on the one below it. The lower 
 
 Transparent entitlement calculation for **49 countries**. Budget simulation with targeting presets and multi-country comparison. Non-custodial disbursement system with Solana USDC, EVM, and M-Pesa providers. Pilot lifecycle management with donor reporting and variance analysis. Secure admin UI with login, approval workflows, audit trails. **240+ tests** across 15 suites.
 
-### 🔜 Next: Identity, Evidence & Sub-national Data
+### 🔜 Next: Deep Simulation — Make It Sell (Phases 14–16)
 
-- **🪪 Identity** — pluggable provider interface for national ID, biometrics, or wallet-based verification
-- **📈 Evidence** — pre/post metrics, control groups, outcome surveys, research-grade exports (CSV, Parquet, SPSS)
-- **🗺️ Sub-national data** — regional cost-of-living adjustments, district-level targeting
-- **💱 Multi-currency settlement** — live exchange rates, multi-rail reconciliation
+- **📊 Macro-economic data expansion** — tax revenue, social protection spending, inflation, unemployment, poverty headcount, government debt from World Bank, ILO, and IMF APIs. Rich economic dashboards per country
+- **💰 Funding & fiscal simulation** — model concrete funding mechanisms (income tax surcharge, VAT increase, carbon tax, wealth tax, redirect social spending). Interactive scenario builder with live cost-vs-funding preview
+- **📈 Economic impact modeling** — poverty reduction estimates, purchasing power effects, social security interaction analysis, fiscal multiplier effects. Exportable policy briefs that sell the concept to policymakers
 
-### 🌐 Future: Federation Protocol
+### 🌐 Future
 
-- **Federation** — multiple programs sharing a common standard, avoiding double-payment, comparing efficiency
-- **Portability** — cross-border entitlement transfer without centralizing personal data
-- **Policy simulation at scale** — governments model national UBI with confidence intervals from real pilot outcomes
-- **Open evidence base** — anonymized, aggregated outcome data across all programs, freely available for research
-- **Self-sustaining governance** — protocol governed by its users (governments, NGOs, DAOs, researchers)
+- **Sub-national data** — regional cost-of-living adjustments, district-level targeting
+- **Evidence layer** — outcome metrics, pre/post analysis, control groups, research-grade exports
+- **Identity & enrollment** — pluggable verification, deduplication
+- **Live M-Pesa** — real Safaricom B2C integration
+- **Multi-currency settlement** — cross-rail reconciliation
+- **Federation** — multi-program interop, cross-border portability, open evidence base
 
 See [CLAUDE.md](./CLAUDE.md) for the full vision. See [ROADMAP.md](./ROADMAP.md) for technical details on completed phases.
 
