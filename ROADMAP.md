@@ -1,12 +1,12 @@
 # Roadmap: From Calculator to Pilot Platform
 
-This document describes the next three major phases that transform Open Global Income from a calculation API into an operational platform that can power real basic income pilots.
+This document describes the phases that transform Open Global Income from a calculation API into a policy simulation platform that can convince governments, donors, and NGOs to fund basic income programs.
 
-**Why these phases matter:** The calculation layer (v0.1.0) answers *"how much per person?"* — but an LLM query could do the same. The phases below answer *"how much will it cost, how does the money move, and is it working?"* — that's what makes this project indispensable for anyone running a real program.
+**Why these phases matter:** The calculation layer (v0.1.0) answers *"how much per person?"* — but an LLM query could do the same. Phases 11–13 answer *"how much will it cost, how does the money move, and is it working?"* Phases 14–16 answer the harder questions: *"where does the money come from, what happens to the economy, and why should we do this?"* — that's what makes this project a tool that sells basic income to policymakers.
 
 ---
 
-## Phase 11: Budget Simulation Engine
+## Phase 11: Budget Simulation Engine — Complete ✅
 
 **Goal:** Enable governments and NGOs to model realistic basic income scenarios before committing resources. Answer: *"What would it actually cost to cover X% of the population?"*
 
@@ -354,29 +354,363 @@ New events:
 
 ---
 
+---
+
+## Phase 14: Macro-Economic Data Expansion
+
+**Goal:** Transform thin country profiles into rich economic dashboards. The current 5 indicators per country (GDP, GNI, PPP, Gini, population) are enough to calculate a cost — but not enough to argue a policy. Answer: *"What's the full economic picture?"*
+
+### 14.1 — New World Bank indicators
+
+Expand `src/data/worldbank/config.json` to fetch additional indicators. Add to the existing `npm run data:update` pipeline:
+
+| Field | World Bank Code | Why it matters |
+|-------|----------------|---------------|
+| `taxRevenuePercentGdp` | `GC.TAX.TOTL.GD.ZS` | Total tax revenue as % of GDP — fiscal capacity |
+| `socialProtectionSpendingPercentGdp` | `GC.XPN.COMP.ZS` | Government spending on compensation + social benefits |
+| `inflationRate` | `FP.CPI.TOTL.ZG` | Consumer price inflation — UBI's effect on purchasing power |
+| `laborForceParticipation` | `SL.TLF.CACT.ZS` | Labor force participation rate — baseline for employment effects |
+| `unemploymentRate` | `SL.UEM.TOTL.ZS` | Unemployment rate — who is UBI reaching? |
+| `governmentDebtPercentGdp` | `GC.DOD.TOTL.GD.ZS` | Central government debt — fiscal space constraint |
+| `socialContributionsPercentRevenue` | `GC.REV.SOCL.ZS` | Social security contributions as % of revenue |
+| `povertyHeadcountRatio` | `SI.POV.DDAY` | Population below $2.15/day — extreme poverty baseline |
+| `gdpGrowthRate` | `NY.GDP.MKTP.KD.ZG` | GDP growth — economic context for sustainability |
+| `healthExpenditurePercentGdp` | `SH.XPD.CHEX.GD.ZS` | Health spending — existing social infrastructure |
+| `educationExpenditurePercentGdp` | `SE.XPD.TOTL.GD.ZS` | Education spending — existing social infrastructure |
+| `urbanizationRate` | `SP.URB.TOTL.IN.ZS` | Urban population share — cost-of-living context |
+
+All nullable — many countries have sparse data. The transformer validates gracefully; missing indicators don't block the rest. The `CountryStats` type in `src/core/types.ts` gains these as optional fields.
+
+### 14.2 — ILO social protection data
+
+World Bank indicators don't capture the granularity of existing social transfer programs. The ILO Social Protection Data Dashboard provides:
+
+- `socialProtectionCoveragePercent` — % of population covered by at least one social protection benefit
+- `socialProtectionExpenditurePercentGdp` — social protection expenditure excluding health (more precise than WB)
+- `pensionCoveragePercent` — % of elderly receiving a pension
+- `childBenefitCoveragePercent` — % of children receiving child/family benefits
+
+New `src/data/ilo/` module following the same fetcher/transformer/validator pattern as `src/data/worldbank/`. The ILO SDMX API is publicly accessible.
+
+### 14.3 — IMF fiscal data
+
+For countries where World Bank tax data is sparse, supplement with IMF Government Finance Statistics:
+
+- Tax revenue breakdown by type (income tax, VAT/sales tax, property tax, trade taxes)
+- More granular than the World Bank single-indicator tax revenue figure
+- Enables the funding mechanism modeling in Phase 15
+
+New `src/data/imf/` module. The IMF SDMX REST API is publicly accessible.
+
+### 14.4 — Enriched country profile API
+
+Extend `GET /v1/income/countries/:code` to return the full economic dashboard:
+
+```json
+{
+  "code": "KE",
+  "name": "Kenya",
+  "stats": {
+    "gdpPerCapitaUsd": 2099,
+    "gniPerCapitaUsd": 2010,
+    "pppConversionFactor": 49.37,
+    "giniIndex": 38.7,
+    "population": 54030000,
+    "incomeGroup": "LMC",
+    "taxRevenuePercentGdp": 16.1,
+    "socialProtectionSpendingPercentGdp": 2.3,
+    "socialProtectionCoveragePercent": 28.4,
+    "inflationRate": 7.7,
+    "laborForceParticipation": 72.3,
+    "unemploymentRate": 5.7,
+    "governmentDebtPercentGdp": 68.2,
+    "povertyHeadcountRatio": 29.4,
+    "gdpGrowthRate": 5.4,
+    "taxBreakdown": {
+      "incomeTaxPercentGdp": 6.2,
+      "vatPercentGdp": 4.8,
+      "tradeTaxPercentGdp": 1.4,
+      "otherTaxPercentGdp": 3.7
+    }
+  }
+}
+```
+
+### 14.5 — Admin UI: country economic dashboard
+
+New `/admin/countries/:code` page showing the full economic profile with visual indicators:
+
+- Key stats in card format with color-coded indicators (e.g., debt/GDP > 60% = amber)
+- Comparison against income group averages ("Kenya's tax/GDP is 16.1% vs. LMC average of 14.3%")
+- Data completeness indicator per country (so users know what's available)
+
+### 14.6 — Tests & validation
+
+- Extend the data validator to check new indicators (reasonable ranges, no negative tax rates, etc.)
+- API tests for enriched country profiles
+- Graceful degradation tests (missing ILO/IMF data doesn't break anything)
+
+---
+
+## Phase 15: Funding & Fiscal Simulation
+
+**Goal:** Answer the question that every finance minister and donor asks first: *"Where does the money come from?"* Model concrete funding mechanisms and show how a UBI program fits into a country's existing fiscal picture.
+
+### 15.1 — Funding mechanism models
+
+New pure functions in `src/core/funding.ts` — each takes a country's fiscal data and returns how much UBI a given policy change could fund:
+
+| Mechanism | Calculation | Example |
+|-----------|------------|---------|
+| **Flat income tax surcharge** | `surchargeRate × gniPerCapita × population × laborForceParticipation` | "A 2% income surcharge in Kenya raises ~X billion KES/year" |
+| **VAT increase** | `vatIncreasePoints × gdp × (currentVatShare / currentVatRate)` | "Raising VAT by 1pp raises ~X" |
+| **Carbon tax** | `carbonTaxPerTon × countryEmissions` (new data: CO2 emissions from WB `EN.ATM.CO2E.KT`) | "A $25/ton carbon tax raises ~X" |
+| **Wealth tax** | Proxy: `wealthTaxRate × gdp × wealthToGdpRatio` (using Credit Suisse Global Wealth Report estimates by income group) | "A 1% wealth tax raises ~X" |
+| **Financial transaction tax** | `fttRate × stockMarketTurnover` (WB `CM.MKT.TRNR`) | "A 0.1% FTT raises ~X" |
+| **Redirect social spending** | `redirectPercent × socialProtectionSpendingPercentGdp × gdp` | "Redirecting 50% of current social protection spending covers X% of UBI" |
+
+Each mechanism is a pure function: `(country, params) → FundingEstimate`. No side effects.
+
+```typescript
+interface FundingEstimate {
+  mechanism: string;
+  annualRevenueLocal: number;
+  annualRevenuePppUsd: number;
+  coversPercentOfUbiCost: number;  // how much of the simulated UBI this funds
+  assumptions: string[];            // explicit list of assumptions made
+}
+```
+
+### 15.2 — Fiscal space analysis
+
+`POST /v1/simulate/fiscal`
+
+Given a simulation result, show how it fits into the country's fiscal picture:
+
+```json
+{
+  "country": "KE",
+  "ubiCost": { "annualPppUsd": 27223260000, "asPercentOfGdp": 24.1 },
+  "fiscalContext": {
+    "totalTaxRevenue": { "percentGdp": 16.1, "absolutePppUsd": "..." },
+    "currentSocialSpending": { "percentGdp": 2.3, "absolutePppUsd": "..." },
+    "governmentDebt": { "percentGdp": 68.2 },
+    "ubiAsPercentOfTaxRevenue": 149.7,
+    "ubiAsPercentOfSocialSpending": 1047.8
+  },
+  "fundingScenarios": [
+    {
+      "name": "Mixed: 3% income surcharge + 2pp VAT + redirect 30% social spending",
+      "mechanisms": [ ... ],
+      "totalRevenue": "...",
+      "coverageOfUbiCost": 0.34,
+      "gap": "..."
+    }
+  ]
+}
+```
+
+The point: show that full universal UBI is expensive, but targeted UBI (bottom quintile, children, elderly) with mixed funding can be realistic. The numbers tell the story.
+
+### 15.3 — Funding scenario builder API
+
+`POST /v1/simulate/fund`
+
+Accept a simulation ID plus a list of funding mechanisms with parameters:
+
+```json
+{
+  "simulationId": "...",
+  "mechanisms": [
+    { "type": "income_tax_surcharge", "rate": 0.03 },
+    { "type": "vat_increase", "points": 2 },
+    { "type": "redirect_social_spending", "percent": 0.3 }
+  ]
+}
+```
+
+Returns the combined funding estimate with coverage gap analysis.
+
+### 15.4 — Admin UI: funding scenario builder
+
+Interactive page at `/admin/simulate/fund`:
+
+- Start from a saved simulation (or run one inline)
+- Add funding mechanisms with sliders (tax rate, VAT points, redirect %)
+- **Live preview** via htmx: as sliders move, the funding estimate updates
+- Stacked bar chart showing: UBI cost vs. combined funding sources vs. gap
+- Side panel: fiscal context (debt/GDP, tax/GDP, social spending/GDP)
+- "What would it take?" mode: auto-calculate the tax rate needed to fully fund the scenario
+- Export as JSON or printable summary
+
+### 15.5 — Saved funding scenarios
+
+Extend the `simulations` table or add a `funding_scenarios` table to persist scenarios with their mechanism configurations and results.
+
+### 15.6 — Tests
+
+- Unit tests for each funding mechanism calculation (pure functions)
+- Verify that assumptions are explicitly listed in output
+- API tests for fiscal analysis and scenario builder
+- Edge cases: missing fiscal data, zero tax revenue, 100% redirect
+
+---
+
+## Phase 16: Economic Impact Simulation
+
+**Goal:** Model what UBI *does* to an economy, not just what it *costs*. Answer: *"What happens to poverty, purchasing power, and existing social systems?"*
+
+### 16.1 — Poverty reduction modeling
+
+Pure functions in `src/core/impact.ts`:
+
+- **Poverty gap closure:** Given the poverty headcount ratio and UBI amount, estimate how many people move above the poverty line
+- **Poverty depth reduction:** By how much does the average poor person's income improve?
+- Uses the $2.15/day (extreme) and $3.65/day (moderate) poverty lines from World Bank
+- Output: `{ extremePovertyReduction: 0.73, moderatePovertyReduction: 0.41 }` — "UBI at this level would lift an estimated 73% of the extreme poor above the line"
+
+Simplifying assumption: uniform distribution of income below the poverty line (acknowledged in output). More sophisticated models can replace this later.
+
+### 16.2 — Purchasing power & inflation modeling
+
+- **Direct transfer effect:** UBI increases disposable income for recipients. For bottom-quintile targeting, show the percentage increase in income for the poorest 20%
+- **Inflation risk indicator:** Based on the transfer size relative to GDP and the country's current inflation rate, flag inflation risk levels:
+  - Low: UBI < 5% of GDP and inflation < 5%
+  - Medium: UBI 5–15% of GDP or inflation 5–10%
+  - High: UBI > 15% of GDP or inflation > 10%
+- **Real value adjustment:** Show the UBI amount adjusted for expected inflation over the program duration
+- These are indicators and estimates, not predictions — clearly labeled as such
+
+### 16.3 — Social security interaction analysis
+
+For countries with social protection data (from ILO in Phase 14):
+
+- **Overlap analysis:** "X% of the population already receives some social protection. UBI would reach the remaining Y%"
+- **Complement vs. replace scenarios:**
+  - *Complement*: UBI on top of existing programs → total cost is additive
+  - *Replace*: UBI replaces existing programs → net cost is UBI minus current spending
+  - *Hybrid*: UBI replaces some programs (cash transfers, pensions below UBI level) while keeping others (health, education)
+- Show the **coverage gap**: people who currently receive no social protection and would be reached by UBI
+- Output as structured data: `{ currentCoverage, ubiBeneficiaries, overlap, newlyCovered, coverageGap }`
+
+### 16.4 — Economic multiplier estimates
+
+Simple fiscal multiplier modeling:
+
+- Cash transfers to low-income populations have multiplier effects (recipients spend locally)
+- Literature-based multiplier ranges by income group: LIC ~1.5x, LMC ~1.3x, UMC ~1.1x, HIC ~0.8x
+- Show the estimated GDP stimulus: `ubiCost × multiplier = stimulusEffect`
+- Clearly labeled as estimates based on published research ranges, not predictions
+
+### 16.5 — Comprehensive impact report
+
+`GET /v1/simulate/:id/impact`
+
+Combines all impact dimensions into a single structured report:
+
+```json
+{
+  "simulation": { "id": "...", "country": "KE", "coverage": 0.2 },
+  "impact": {
+    "povertyReduction": {
+      "extremePovertyReduction": 0.73,
+      "moderatePovertyReduction": 0.41,
+      "peopleLiftedAbovePovertyLine": 3900000
+    },
+    "purchasingPower": {
+      "incomeIncreaseForPoorest20Percent": 0.85,
+      "inflationRiskLevel": "medium",
+      "realValueAfterInflation": 194.3
+    },
+    "socialProtection": {
+      "currentCoveragePercent": 28.4,
+      "newCoveragePercent": 48.4,
+      "newlyCoveredPopulation": 10800000,
+      "replacementSavings": 1200000000
+    },
+    "economicStimulus": {
+      "multiplier": 1.3,
+      "estimatedGdpStimulus": 35390238000,
+      "stimulusAsPercentOfGdp": 31.3
+    }
+  },
+  "assumptions": [
+    "Poverty distribution assumed uniform below poverty line",
+    "Multiplier based on World Bank meta-analysis of cash transfer programs in LMCs",
+    "Inflation risk is an indicator, not a forecast"
+  ],
+  "meta": { "rulesetVersion": "v1", "dataVersion": "worldbank-2023" }
+}
+```
+
+### 16.6 — Admin UI: impact dashboard
+
+The centerpiece of the "sell the concept" vision. New `/admin/simulate/:id/impact` page:
+
+- **Hero section:** "UBI for Kenya's poorest 20%" with the key number front-and-center
+- **Poverty card:** People lifted out of poverty, with before/after comparison bar
+- **Purchasing power card:** Income increase for recipients, inflation risk badge
+- **Social protection card:** Current vs. new coverage, Venn-style overlap visualization
+- **Fiscal card:** Cost vs. funding sources (links to Phase 15 scenario), GDP stimulus
+- **Assumptions footer:** Every simplification explicitly listed — builds trust
+- **Export:** "Download as PDF brief" (server-rendered HTML → PDF via headless Chrome or Puppeteer)
+- **Share:** Unique URL per impact report for linking in proposals and presentations
+
+### 16.7 — Tests
+
+- Unit tests for poverty reduction models with known inputs
+- Inflation risk classification tests
+- Social protection overlap calculation tests
+- Multiplier estimation tests
+- Verify assumptions are always included in output
+- End-to-end: create simulation → run impact → verify all sections populated
+
+---
+
 ## Dependency chain
 
 ```
-Phase 11 (Simulation)
+Phase 11 (Simulation) ✅
     ↓ simulation_id
-Phase 12 (Disbursement)  ← uses adapters (Solana, EVM)
+Phase 12 (Disbursement) ✅ ← uses adapters (Solana, EVM)
     ↓ disbursement_id
-Phase 13 (Pilot Dashboard) ← ties simulations + disbursements together
+Phase 13 (Pilot Dashboard) ✅
+    ↓
+Phase 14 (Macro-Economic Data) ← enriches country profiles with fiscal + social data
+    ↓ country data feeds into
+Phase 15 (Funding Simulation) ← "where does the money come from?"
+    ↓ funding scenarios feed into
+Phase 16 (Economic Impact)    ← "what happens to the economy?"
 ```
 
-Each phase builds on the previous. Phase 11 can be used standalone (an NGO just modeling costs). Phase 12 adds the ability to act on those models. Phase 13 wraps everything in operational visibility.
+Phases 14–16 form a coherent batch: richer data enables funding analysis, which feeds into impact modeling. Phase 14 is independently useful (better country profiles). Phase 15 requires Phase 14's fiscal data. Phase 16 requires both.
+
+---
+
+## Future phases
+
+These are deferred in favor of simulation depth, but remain on the roadmap:
+
+- **Sub-national data** — regional cost-of-living adjustments, district-level targeting
+- **Evidence layer** — outcome metrics, pre/post analysis, control groups, research exports
+- **Identity & enrollment** — pluggable verification, deduplication
+- **Live M-Pesa** — real Safaricom B2C integration
+- **Multi-currency settlement** — cross-rail reconciliation
+- **Federation** — multi-program interop, cross-border portability
 
 ---
 
 ## What this enables
 
-After all three phases, the platform supports this end-to-end workflow:
+After all phases, the platform supports this workflow — designed to convince, not just calculate:
 
-1. **Model** — NGO runs `POST /v1/simulate` for Kenya, bottom 20%, 12 months → sees it costs ~1.34T KES/year
-2. **Decide** — Compares against Mozambique and Burundi via `/v1/simulate/compare`
-3. **Fund** — Creates a pilot, links it to the simulation
-4. **Pay** — Creates disbursements via Solana USDC or M-Pesa, approves and submits
-5. **Monitor** — Views the pilot dashboard, tracks actual vs. projected spend
-6. **Report** — Generates a structured report for donors with full audit trail
+1. **Model** — Government ministry runs `POST /v1/simulate` for Kenya, bottom 20%, 12 months
+2. **Contextualize** — Views the enriched country profile: tax capacity, social spending, poverty rates, debt
+3. **Fund** — Uses the scenario builder to model funding: "3% income surcharge + 2pp VAT + redirect 30% of social spending covers 34% of cost"
+4. **Impact** — Generates the impact report: "Lifts 3.9M people above the extreme poverty line, covers 10.8M currently uncovered by social protection, income increase of 85% for the poorest quintile"
+5. **Present** — Exports a PDF policy brief with all the numbers, sources, and assumptions
+6. **Decide** — Compares across countries, adjusts targeting and funding, picks the most feasible pilot
+7. **Deploy** — Creates a pilot, links it to the simulation, starts disbursements
+8. **Report** — Tracks actual vs. projected spend with full audit trail
 
-*That* is something an LLM query cannot do.
+*That* is a tool that sells basic income to policymakers.
