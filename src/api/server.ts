@@ -19,6 +19,7 @@ import { disbursementsRoute } from './routes/disbursements.js';
 import { pilotsRoute } from './routes/pilots.js';
 import { fundingRoute } from './routes/funding.js';
 import { impactRoute } from './routes/impact.js';
+import { regionsRoute } from './routes/regions.js';
 import { adminRoutes } from '../admin/routes.js';
 
 export interface ServerOptions {
@@ -164,6 +165,7 @@ export function buildServer(opts?: ServerOptions) {
   app.register(incomeRoute, { prefix: '/v1/income' });
   app.register(rulesetsRoute, { prefix: '/v1/income' });
   app.register(countriesRoute, { prefix: '/v1/income' });
+  app.register(regionsRoute, { prefix: '/v1/income' });
   app.register(usersRoute, { prefix: '/v1' });
   app.register(simulateRoute, { prefix: '/v1' });
   app.register(simulationsRoute, { prefix: '/v1' });

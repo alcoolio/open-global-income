@@ -1,7 +1,13 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import type { Country } from '../core/types.js';
+import type { Country, Region } from '../core/types.js';
+
+interface RegionDataFile {
+  dataVersion: string;
+  source?: string;
+  regions: Region[];
+}
 
 interface CountryDataFile {
   dataVersion: string;
@@ -176,4 +182,47 @@ export function getCountryDataCompleteness(code: string): DataCompleteness | nul
 /** Reset the cache (for testing) */
 export function resetCache(): void {
   cached = null;
+}
+
+// ── Region data loader ────────────────────────────────────────────────────────
+
+let cachedRegions: RegionDataFile | null = null;
+
+function loadRegions(): RegionDataFile {
+  if (cachedRegions) return cachedRegions;
+  const filePath = join(__dirname, 'regions.json');
+  if (!existsSync(filePath)) {
+    cachedRegions = { dataVersion: 'none', regions: [] };
+    return cachedRegions;
+  }
+  const raw = readFileSync(filePath, 'utf-8');
+  cachedRegions = JSON.parse(raw) as RegionDataFile;
+  return cachedRegions;
+}
+
+/** Get the data version string for the regions dataset */
+export function getRegionsDataVersion(): string {
+  return loadRegions().dataVersion;
+}
+
+/** Get all regions */
+export function getAllRegions(): Region[] {
+  return loadRegions().regions;
+}
+
+/** Look up a region by its id (e.g. "KE-NAI"), case-insensitive */
+export function getRegionById(id: string): Region | undefined {
+  const upper = id.toUpperCase();
+  return loadRegions().regions.find((r) => r.id === upper);
+}
+
+/** Get all regions for a given country code */
+export function getRegionsByCountry(countryCode: string): Region[] {
+  const upper = countryCode.toUpperCase();
+  return loadRegions().regions.filter((r) => r.countryCode === upper);
+}
+
+/** Reset the regions cache (for testing) */
+export function resetRegionsCache(): void {
+  cachedRegions = null;
 }

@@ -6,11 +6,14 @@ import { renderAuditLog, renderAuditTable } from './views/audit.js';
 import { renderSimulatePage, renderSimulationPreview, renderComparisonTable } from './views/simulate.js';
 import { renderPilotsPage, renderPilotDetailPage } from './views/pilots.js';
 import { renderCountryList, renderCountryDetail, type CountryListItem } from './views/countries.js';
+import { renderRegionList, renderRegionDetail } from './views/regions.js';
 import { renderFundingPage, renderFundingPreview } from './views/funding.js';
 import { renderImpactPage, renderImpactPreview, renderAnalysesTable } from './views/impact.js';
 import { listApiKeys, createApiKey, revokeApiKey, type ApiKeyTier } from '../db/api-keys.js';
 import { getRecentAuditEntries, getAuditStats } from '../db/audit.js';
-import { getAllCountries, getCountryByCode, getDataVersion, getCountryDataCompleteness } from '../data/loader.js';
+import { getAllCountries, getCountryByCode, getDataVersion, getCountryDataCompleteness, getAllRegions, getRegionById, getRegionsDataVersion } from '../data/loader.js';
+import { buildRegionAdjustedCountry } from '../core/regions.js';
+import { calculateEntitlement } from '../core/rules.js';
 import { getDb } from '../db/database.js';
 import { calculateSimulation } from '../core/simulations.js';
 import { listSimulations, saveSimulation, deleteSimulation, getSimulationById } from '../db/simulations-db.js';
@@ -761,5 +764,38 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
     return reply
       .type('text/html')
       .send(renderCountryDetail(country, completeness, allCountries, getDataVersion()));
+  });
+
+  // ── Regions ──────────────────────────────────────────────────────────────
+
+  app.get('/regions', async (_request, reply) => {
+    const regions = getAllRegions();
+    return reply
+      .type('text/html')
+      .send(renderRegionList(regions, getRegionsDataVersion()));
+  });
+
+  app.get<{ Params: { id: string } }>('/regions/:id', async (request, reply) => {
+    const region = getRegionById(request.params.id);
+    if (!region) {
+      return reply.redirect('/admin/regions?flash=Region+not+found');
+    }
+    const country = getCountryByCode(region.countryCode);
+    if (!country) {
+      return reply.redirect('/admin/regions?flash=Country+data+not+found');
+    }
+    const dataVersion = getDataVersion();
+    const nationalEntitlement = calculateEntitlement(country, dataVersion);
+    const adjustedCountry = buildRegionAdjustedCountry(country, region);
+    const regionalEntitlement = calculateEntitlement(adjustedCountry, dataVersion);
+    return reply
+      .type('text/html')
+      .send(renderRegionDetail(
+        region,
+        country.stats.pppConversionFactor,
+        nationalEntitlement.localCurrencyPerMonth,
+        regionalEntitlement.localCurrencyPerMonth,
+        getRegionsDataVersion(),
+      ));
   });
 };

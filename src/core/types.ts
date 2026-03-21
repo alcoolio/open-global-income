@@ -84,6 +84,50 @@ export interface Country {
   stats: CountryStats;
 }
 
+// ── Sub-national region types ─────────────────────────────────────────────
+
+export interface RegionStats {
+  /** Population of this region */
+  population: number;
+  /**
+   * Cost-of-living index relative to the national average.
+   * 1.0 = identical to national average.
+   * >1.0 = more expensive (e.g. capital city).
+   * <1.0 = cheaper (e.g. rural area).
+   * Applied as a multiplier to pppConversionFactor.
+   */
+  costOfLivingIndex: number;
+  /** Urban/rural classification */
+  urbanRural: 'urban' | 'rural' | 'mixed';
+  /** Regional poverty headcount ratio (%), if known */
+  povertyHeadcountRatio?: number | null;
+  /** ISO 8601 date when this data was last sourced */
+  dataAsOf: string;
+  /** Source of this regional data */
+  dataSource: string;
+}
+
+export interface Region {
+  /** Unique id: countryCode + "-" + regionCode, e.g. "KE-NAI" */
+  id: string;
+  /** ISO 3166-1 alpha-2 of the parent country */
+  countryCode: CountryCode;
+  /** Short code unique within the country */
+  regionCode: string;
+  /** Human-readable name */
+  name: string;
+  stats: RegionStats;
+}
+
+/** Entitlement result for a specific region */
+export interface RegionalIncomeEntitlement extends GlobalIncomeEntitlement {
+  regionId: string;
+  regionName: string;
+  costOfLivingIndex: number;
+  /** National-level localCurrencyPerMonth for comparison */
+  nationalLocalCurrencyPerMonth: number;
+}
+
 export interface RulesetMeta {
   /** Semver-like identifier for the formula version */
   rulesetVersion: string;
