@@ -452,7 +452,7 @@ New `/admin/countries/:code` page showing the full economic profile with visual 
 
 ---
 
-## Phase 15: Funding & Fiscal Simulation
+## Phase 15: Funding & Fiscal Simulation — Complete ✅
 
 **Goal:** Answer the question that every finance minister and donor asks first: *"Where does the money come from?"* Model concrete funding mechanisms and show how a UBI program fits into a country's existing fiscal picture.
 
@@ -678,7 +678,7 @@ Phase 13 (Pilot Dashboard) ✅
     ↓
 Phase 14 (Macro-Economic Data) ← enriches country profiles with fiscal + social data
     ↓ country data feeds into
-Phase 15 (Funding Simulation) ← "where does the money come from?"
+Phase 15 (Funding Simulation) ✅ ← "where does the money come from?"
     ↓ funding scenarios feed into
 Phase 16 (Economic Impact)    ← "what happens to the economy?"
 ```

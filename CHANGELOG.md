@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.5] - 2026-03-21
+
+### Added
+- **Funding scenario builder** — model concrete funding mechanisms and see how a basic income program fits into a country's fiscal picture
+- **6 funding mechanism calculators** in `src/core/funding.ts` (pure functions, no side effects):
+  - **Income tax surcharge** — flat surcharge on income tax applied to employed population
+  - **VAT increase** — additional percentage points on value-added tax (uses IMF breakdown when available)
+  - **Carbon tax** — per-ton CO2 tax using income-group emission intensity proxies
+  - **Wealth tax** — annual tax on estimated private wealth (Credit Suisse wealth-to-GDP ratios)
+  - **Financial transaction tax** — tax on stock market turnover (income-group proxies)
+  - **Redirect social spending** — redirect a portion of existing social protection spending (ILO/WB data)
+- **Fiscal context analysis** — shows UBI cost relative to tax revenue, social spending, and government debt
+- **3 new API endpoints:**
+  - `POST /v1/simulate/fiscal` — fiscal context analysis for a country's UBI cost
+  - `POST /v1/simulate/fund` — build a funding scenario with multiple mechanisms and coverage gap analysis
+  - Full CRUD for `/v1/funding-scenarios` (save, list, get, delete)
+- **Interactive admin UI** at `/admin/funding`:
+  - Slider controls for each mechanism with enable/disable toggles
+  - Live preview via htmx with summary cards (cost, funding raised, % covered, gap)
+  - Stacked bar chart showing funding sources vs. remaining gap
+  - Per-mechanism revenue breakdown with colored indicators
+  - Fiscal context panel (tax/GDP, social spending/GDP, debt/GDP, UBI as % of tax revenue)
+  - Assumptions section — every simplification explicitly stated for policymaker trust
+  - Save scenarios and export as JSON
+- **`funding_scenarios` database table** (SQLite schema + PostgreSQL migration `004_add_funding_scenarios.sql`)
+- **`funding_scenario.created` webhook event**
+- **25 new tests** — all funding mechanisms, fiscal context, full scenario builder, edge cases, determinism
+- `src/db/funding-db.ts` — CRUD helpers for the funding_scenarios table
+- `FundingMechanismType`, `FundingMechanismInput`, `FundingEstimate`, `FiscalContext`, `FundingScenarioResult`, `SavedFundingScenario` types in `src/core/types.ts`
+
+### Changed
+- Admin nav updated with **Funding** link
+- OpenAPI spec version bumped to `0.1.5`
+- Phase 15 marked complete in `ROADMAP.md`
+- README updated with funding API endpoints, admin UI section, webhook event, and current status
+- Test count: 288 tests across 18 suites (up from 263 across 17 suites)
+
 ## [0.1.4] - 2026-03-20
 
 ### Added
