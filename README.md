@@ -34,14 +34,12 @@ Open Global Income is a stack. Each layer builds on the one below it. The lower 
 └─────────────────────────────────────────────────┘
 ```
 
-### ✅ Built (v0.1.4)
+### ✅ Built (v0.1.5)
 
-Transparent entitlement calculation for **49 countries**. Budget simulation with targeting presets and multi-country comparison. Non-custodial disbursement system with Solana USDC, EVM, and M-Pesa providers. Pilot lifecycle management with donor reporting and variance analysis. Secure admin UI with login, approval workflows, audit trails. **240+ tests** across 15 suites.
+Transparent entitlement calculation for **49 countries**. Budget simulation with targeting presets and multi-country comparison. Non-custodial disbursement system with Solana USDC, EVM, and M-Pesa providers. Pilot lifecycle management with donor reporting and variance analysis. Enriched country profiles with 17+ macro-economic indicators from World Bank, ILO, and IMF. **Funding scenario builder** with 6 funding mechanisms, fiscal context analysis, and interactive admin UI. Secure admin UI with login, approval workflows, audit trails. **288 tests** across 18 suites.
 
-### 🔜 Next: Deep Simulation — Make It Sell (Phases 14–16)
+### 🔜 Next: Economic Impact Modeling (Phase 16)
 
-- **📊 Macro-economic data expansion** — tax revenue, social protection spending, inflation, unemployment, poverty headcount, government debt from World Bank, ILO, and IMF APIs. Rich economic dashboards per country
-- **💰 Funding & fiscal simulation** — model concrete funding mechanisms (income tax surcharge, VAT increase, carbon tax, wealth tax, redirect social spending). Interactive scenario builder with live cost-vs-funding preview
 - **📈 Economic impact modeling** — poverty reduction estimates, purchasing power effects, social security interaction analysis, fiscal multiplier effects. Exportable policy briefs that sell the concept to policymakers
 
 ### 🌐 Future
@@ -233,6 +231,19 @@ All responses follow a consistent shape:
 | `GET` | `/v1/disbursements/:id` | Get status and audit log |
 | `GET` | `/v1/disbursements` | List all disbursements (paginated) |
 
+### Funding & Fiscal Simulation
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/v1/simulate/fiscal` | Fiscal context analysis for a country's UBI cost |
+| `POST` | `/v1/simulate/fund` | Build a funding scenario with multiple mechanisms |
+| `POST` | `/v1/funding-scenarios` | Save a funding scenario |
+| `GET` | `/v1/funding-scenarios` | List saved scenarios (paginated) |
+| `GET` | `/v1/funding-scenarios/:id` | Retrieve a saved scenario |
+| `DELETE` | `/v1/funding-scenarios/:id` | Delete a saved scenario |
+
+**Supported funding mechanisms:** income tax surcharge, VAT increase, carbon tax, wealth tax, financial transaction tax, redirect social spending. Each returns explicit assumptions and revenue estimates.
+
 ### Pilots
 
 | Method | Endpoint | Description |
@@ -301,7 +312,9 @@ Server-rendered dashboard using htmx (no SPA). Enable with `ENABLE_ADMIN=true`.
 - **API Key Management** — create and revoke keys with tier selection
 - **Audit Log** — recent API requests with live-refresh
 - **Simulate** — budget simulations with live cost preview, comparison, save/delete
+- **Funding** — interactive scenario builder with slider controls for 6 funding mechanisms, stacked bar chart, fiscal context panel, and assumption transparency
 - **Pilots** — create and manage pilots, link disbursements, track status, view variance
+- **Countries** — economic dashboards with data completeness indicators
 
 Access at `http://localhost:3333/admin/login`. Sessions are secure (HttpOnly cookies, PBKDF2-hashed passwords) with brute-force protection (15-minute lockout after 5 failed attempts).
 
@@ -334,7 +347,7 @@ Non-custodial — calculates and prepares payment instructions, never holds or m
 
 Subscribe to events and receive HMAC-SHA256 signed payloads:
 
-`entitlement.calculated` · `user.created` · `api_key.created` · `api_key.revoked` · `data.updated` · `simulation.created` · `disbursement.created` · `disbursement.approved` · `disbursement.completed` · `disbursement.failed` · `pilot.created` · `pilot.status_changed` · `pilot.report_generated`
+`entitlement.calculated` · `user.created` · `api_key.created` · `api_key.revoked` · `data.updated` · `simulation.created` · `disbursement.created` · `disbursement.approved` · `disbursement.completed` · `disbursement.failed` · `pilot.created` · `pilot.status_changed` · `pilot.report_generated` · `funding_scenario.created`
 
 See `src/webhooks/` for the dispatcher and type definitions.
 
@@ -391,7 +404,7 @@ See [GOVERNANCE.md](./GOVERNANCE.md) for the decision-making process, API stabil
 
 ## 📋 Current Status
 
-**Version 0.1.4** — Admin UI with secure login. 240+ tests across 15 test suites.
+**Version 0.1.5** — Funding scenario builder with interactive UI. 288 tests across 18 test suites.
 
 See [CHANGELOG.md](./CHANGELOG.md) for full version history.
 
