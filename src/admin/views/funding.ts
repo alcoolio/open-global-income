@@ -165,7 +165,10 @@ export function renderFundingPage(
             <label>${t('funding.targetGroup')}</label>
             <select name="targetGroup">
               <option value="all">${t('funding.targetGroupAll')}</option>
+              <option value="bottom_decile">${t('funding.targetGroupBottomDecile')}</option>
               <option value="bottom_quintile">${t('funding.targetGroupBottomQuintile')}</option>
+              <option value="bottom_third">${t('funding.targetGroupBottomThird')}</option>
+              <option value="bottom_half">${t('funding.targetGroupBottomHalf')}</option>
             </select>
           </div>
         </div>

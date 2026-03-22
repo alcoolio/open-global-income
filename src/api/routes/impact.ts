@@ -27,8 +27,8 @@ function resolveImpactParams(body: Record<string, unknown>): {
   if (coverage <= 0 || coverage > 1) {
     return { ok: false, message: "'coverage' must be between 0 (exclusive) and 1 (inclusive)" };
   }
-  if (!['all', 'bottom_quintile'].includes(targetGroup)) {
-    return { ok: false, message: "'targetGroup' must be 'all' or 'bottom_quintile'" };
+  if (!['all', 'bottom_decile', 'bottom_quintile', 'bottom_third', 'bottom_half'].includes(targetGroup)) {
+    return { ok: false, message: "'targetGroup' must be one of: all, bottom_decile, bottom_quintile, bottom_third, bottom_half" };
   }
   if (durationMonths < 1 || durationMonths > 120) {
     return { ok: false, message: "'durationMonths' must be between 1 and 120" };

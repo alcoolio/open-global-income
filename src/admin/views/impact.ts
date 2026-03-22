@@ -139,7 +139,10 @@ export function renderImpactPage(
             <label>${t('impact.targetGroup')}</label>
             <select name="targetGroup">
               <option value="all">${t('impact.targetGroupAll')}</option>
+              <option value="bottom_decile">${t('impact.targetGroupBottomDecile')}</option>
               <option value="bottom_quintile" selected>${t('impact.targetGroupBottomQuintile')}</option>
+              <option value="bottom_third">${t('impact.targetGroupBottomThird')}</option>
+              <option value="bottom_half">${t('impact.targetGroupBottomHalf')}</option>
             </select>
           </div>
         </div>

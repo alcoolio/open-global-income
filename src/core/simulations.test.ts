@@ -59,6 +59,27 @@ describe('calculateSimulation', () => {
     expect(result.simulation.recipientCount).toBe(5403000);
   });
 
+  it('calculates recipient count for bottom_decile', () => {
+    const params: SimulationParameters = { ...defaultParams, coverage: 1.0, targetGroup: 'bottom_decile' };
+    const result = calculateSimulation(kenya, params, DATA_VERSION);
+    // 54030000 × 0.1 = 5403000
+    expect(result.simulation.recipientCount).toBe(5403000);
+  });
+
+  it('calculates recipient count for bottom_third', () => {
+    const params: SimulationParameters = { ...defaultParams, coverage: 1.0, targetGroup: 'bottom_third' };
+    const result = calculateSimulation(kenya, params, DATA_VERSION);
+    // 54030000 × (1/3) ≈ 18010000
+    expect(result.simulation.recipientCount).toBe(Math.round(54030000 / 3));
+  });
+
+  it('calculates recipient count for bottom_half', () => {
+    const params: SimulationParameters = { ...defaultParams, coverage: 1.0, targetGroup: 'bottom_half' };
+    const result = calculateSimulation(kenya, params, DATA_VERSION);
+    // 54030000 × 0.5 = 27015000
+    expect(result.simulation.recipientCount).toBe(27015000);
+  });
+
   it('calculates local currency per month using PPP conversion factor', () => {
     const result = calculateSimulation(kenya, defaultParams, DATA_VERSION);
     // 210 × 49.37 = 10367.7

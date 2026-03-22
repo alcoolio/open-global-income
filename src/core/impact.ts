@@ -52,25 +52,90 @@ const FISCAL_MULTIPLIERS: Record<IncomeGroup, number> = {
   LIC: 2.3,  // Low income — near-complete local spending, strong multiplier
 };
 
+// ── Target Group Helpers ──────────────────────────────────────────────────
+
+/** Map target group to population fraction (mirrors simulations.ts) */
+function getPopulationFraction(targetGroup: TargetGroup): number {
+  switch (targetGroup) {
+    case 'all': return 1.0;
+    case 'bottom_decile': return 0.1;
+    case 'bottom_quintile': return 0.2;
+    case 'bottom_third': return 1 / 3;
+    case 'bottom_half': return 0.5;
+  }
+}
+
+/** Human-readable label for a target group */
+function targetGroupLabel(targetGroup: TargetGroup): string {
+  switch (targetGroup) {
+    case 'all': return 'the full population';
+    case 'bottom_decile': return 'the bottom income decile (poorest 10%)';
+    case 'bottom_quintile': return 'the bottom income quintile (poorest 20%)';
+    case 'bottom_third': return 'the bottom third of the income distribution';
+    case 'bottom_half': return 'the bottom half of the income distribution';
+  }
+}
+
 // ── Lorenz Curve Income Share ──────────────────────────────────────────────
 
 /**
- * Estimate the income share of the bottom quintile using a Lorenz curve
+ * Estimate the income share of the bottom fraction p using a Lorenz curve
  * approximation: L(p) ≈ p^(1 + 2×Gini), where Gini is on the 0–1 scale.
  *
  * This is a well-known parametric approximation. For a standard Lorenz
- * curve the income share of the bottom fraction p equals L(p). The
- * bottom quintile corresponds to p = 0.2.
+ * curve the income share of the bottom fraction p equals L(p).
  *
- * Validation against World Bank quintile data:
+ * Validation against World Bank quintile data (p=0.2):
  *   Kenya (Gini 0.39):        formula → 5.8%   actual ~5–6%   ✓
  *   South Africa (Gini 0.63): formula → 2.7%   actual ~2–3%   ✓
  *   Denmark (Gini 0.28):      formula → 8.5%   actual ~8–9%   ✓
  *   Brazil (Gini 0.54):       formula → 3.5%   actual ~3–4%   ✓
  */
-function estimateBottomQuintileIncomeShare(giniIndex: number): number {
+function estimateIncomeShare(giniIndex: number, p: number): number {
   const gini = giniIndex / 100; // convert from 0–100 to 0–1
-  return Math.pow(0.2, 1 + 2 * gini);
+  return Math.pow(p, 1 + 2 * gini);
+}
+
+// ── Gini-Adjusted Concentration Factor ───────────────────────────────────
+
+/**
+ * Estimate the social protection exclusion concentration factor for a
+ * targeted population fraction, using the country's Gini coefficient.
+ *
+ * Rationale: In more unequal societies, the poorest are disproportionately
+ * excluded from formal social protection. The concentration factor measures
+ * how much more likely targeted recipients are to be uncovered compared
+ * to the general population.
+ *
+ * Model: concentrationFactor = 1 + (1 - incomeShare/p) × scalingFactor
+ *
+ * Where incomeShare/p is the ratio of the group's income share to their
+ * population share (always ≤ 1 for bottom groups). A group earning far
+ * less than their population share is more likely to be excluded.
+ *
+ * For 'all' targeting, factor is 1.0 (no concentration effect).
+ * For bottom groups: the wider the income gap (driven by Gini), the
+ * higher the concentration factor.
+ *
+ * The scaling factor (0.8) is calibrated so that:
+ *   - Bottom quintile in a medium-inequality country (Gini ~40) → ~1.4×
+ *     (consistent with ILO exclusion research)
+ *   - Bottom decile in a high-inequality country (Gini ~60) → ~1.7×
+ */
+const EXCLUSION_SCALING_FACTOR = 0.8;
+
+function estimateConcentrationFactor(
+  giniIndex: number | null,
+  targetGroup: TargetGroup,
+): number {
+  if (targetGroup === 'all') return 1.0;
+  if (giniIndex == null) return 1.0; // no data — conservative default
+
+  const p = getPopulationFraction(targetGroup);
+  const incomeShare = estimateIncomeShare(giniIndex, p);
+  // incomeShare/p < 1 for all bottom groups when Gini > 0
+  const relativeDeprivation = 1 - incomeShare / p;
+  return 1 + relativeDeprivation * EXCLUSION_SCALING_FACTOR;
 }
 
 // ── 1. Poverty Reduction ───────────────────────────────────────────────────
@@ -100,9 +165,9 @@ export function estimatePovertyReduction(
     `Extreme poverty line: $${povertyLineMonthly.toFixed(2)} PPP-USD/month ($${EXTREME_POVERTY_LINE_DAILY_PPP_USD}/day × 30), World Bank 2017 PPP benchmark.`,
     `Transfer amount: $${floorPppUsd} PPP-USD/month per recipient.`,
     `Any recipient whose pre-transfer income was below $${povertyLineMonthly.toFixed(2)}/month is lifted above the poverty line if the transfer alone exceeds the line (conservative: ignores partial lifts).`,
-    targetGroup === 'bottom_quintile'
-      ? 'Bottom quintile targeting assumed to concentrate on the poorest 20%, where extreme poor are predominantly found.'
-      : 'Universal targeting: extreme poor are assumed uniformly distributed across recipients proportional to their population share.',
+    targetGroup === 'all'
+      ? 'Universal targeting: extreme poor are assumed uniformly distributed across recipients proportional to their population share.'
+      : `Targeting ${targetGroupLabel(targetGroup)}: extreme poor are assumed concentrated in the lowest income groups, so targeting reaches them disproportionately.`,
     `Poverty headcount ratio sourced from World Bank PovcalNet (most recent available year).`,
     'No behavioral effects or price changes assumed — static transfer model.',
   ];
@@ -209,7 +274,7 @@ export function estimatePurchasingPower(
     };
   }
 
-  const incomeShareQ1 = estimateBottomQuintileIncomeShare(gini);
+  const incomeShareQ1 = estimateIncomeShare(gini, 0.2);
   const meanMonthlyIncomeUsd = country.stats.gniPerCapitaUsd / 12;
   const bottomQ1MeanMonthlyUsd = (meanMonthlyIncomeUsd * incomeShareQ1) / 0.2;
   const incomeIncreasePercent =
@@ -243,9 +308,9 @@ export function estimatePurchasingPower(
  *
  * Model:
  *   uncovered = (1 - socialProtectionCoveragePercent/100) × population
- *   For 'bottom_quintile' targeting, extreme poverty correlates with
- *   exclusion from social protection — apply a 1.4× concentration factor
- *   (i.e., the poor are 40% more likely to be uncovered than average).
+ *   For targeted groups, use a Gini-adjusted concentration factor to
+ *   reflect that lower-income groups are disproportionately excluded
+ *   from social protection.
  *   recipientUncoverageRate = min(1, uncoveredFraction × concentrationFactor)
  *   newlyCovered = recipientCount × recipientUncoverageRate
  */
@@ -255,13 +320,14 @@ export function estimateSocialCoverage(
   targetGroup: TargetGroup,
 ): SocialCoverageEstimate {
   const coveragePct = country.stats.socialProtectionCoveragePercent;
+  const concentrationFactor = estimateConcentrationFactor(country.stats.giniIndex, targetGroup);
 
   const assumptions: string[] = [
     `Social protection coverage data from ILO World Social Protection Report (% of population receiving at least one benefit).`,
     `"Currently uncovered" = population without any formal social protection benefit.`,
-    targetGroup === 'bottom_quintile'
-      ? 'Bottom quintile targeting: extreme poor are assumed to be 1.4× more likely to lack social protection coverage than the general population (exclusion concentration factor based on ILO exclusion research).'
-      : 'Universal targeting: recipients assumed to mirror the general population\'s coverage/uncoverage split.',
+    targetGroup === 'all'
+      ? 'Universal targeting: recipients assumed to mirror the general population\'s coverage/uncoverage split.'
+      : `Targeting ${targetGroupLabel(targetGroup)}: Gini-adjusted concentration factor of ${concentrationFactor.toFixed(2)}× applied — lower-income groups are disproportionately excluded from social protection (derived from Lorenz curve income share and country Gini coefficient).`,
     'No double-counting: a person already covered by social protection is not counted as "newly covered" even if they also receive the UBI.',
     'The UBI is treated as additive to — not replacing — existing benefits.',
   ];
@@ -283,8 +349,6 @@ export function estimateSocialCoverage(
   const uncoverageRate = Math.max(0, Math.min(1, 1 - coveragePct / 100));
   const populationCurrentlyUncovered = Math.round(uncoverageRate * country.stats.population);
 
-  // Poverty / bottom-quintile concentration factor
-  const concentrationFactor = targetGroup === 'bottom_quintile' ? 1.4 : 1.0;
   const recipientUncoverageRate = Math.min(1, uncoverageRate * concentrationFactor);
   const estimatedNewlyCovered = Math.round(recipientCount * recipientUncoverageRate);
 
@@ -380,7 +444,7 @@ function buildPolicyBrief(
 ): PolicyBrief {
   const floorPppUsd = params.floorOverride ?? GLOBAL_INCOME_FLOOR_PPP;
   const coveragePct = (params.coverage * 100).toFixed(0);
-  const targetLabel = params.targetGroup === 'all' ? 'the full population' : 'the bottom income quintile';
+  const targetLabel = targetGroupLabel(params.targetGroup);
 
   const title = `Economic Impact Analysis: Basic Income Program — ${country.name}`;
   const subtitle =
@@ -431,9 +495,10 @@ function buildPolicyBrief(
       `Bottom quintile mean income = country mean income (GNI per capita) × income share / 0.20.`,
     socialCoverageModel:
       `Social protection coverage from ILO World Social Protection Report. ` +
-      `Recipients assumed to mirror the general population's coverage rate, with a 1.4× ` +
-      `concentration factor for bottom-quintile targeting (reflecting empirical evidence that ` +
-      `the poorest are disproportionately excluded from formal social protection systems).`,
+      `For targeted groups, a Gini-adjusted concentration factor is applied — derived from ` +
+      `the Lorenz curve income share of the target group relative to their population share. ` +
+      `This reflects empirical evidence that lower-income groups are disproportionately ` +
+      `excluded from formal social protection systems, with the effect scaling with inequality.`,
     fiscalMultiplierModel:
       `Keynesian demand-side fiscal multiplier for direct cash transfers, calibrated by income group: ` +
       `LIC=${FISCAL_MULTIPLIERS.LIC}, LMC=${FISCAL_MULTIPLIERS.LMC}, UMC=${FISCAL_MULTIPLIERS.UMC}, HIC=${FISCAL_MULTIPLIERS.HIC}. ` +

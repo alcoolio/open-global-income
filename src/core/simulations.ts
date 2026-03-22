@@ -6,8 +6,14 @@ function getTargetGroupFactor(targetGroup: TargetGroup): number {
   switch (targetGroup) {
     case 'all':
       return 1.0;
+    case 'bottom_decile':
+      return 0.1;
     case 'bottom_quintile':
       return 0.2;
+    case 'bottom_third':
+      return 1 / 3;
+    case 'bottom_half':
+      return 0.5;
     default: {
       const exhaustive: never = targetGroup;
       throw new Error(`Unknown targetGroup: ${exhaustive}`);

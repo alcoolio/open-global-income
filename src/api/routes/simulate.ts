@@ -3,7 +3,7 @@ import { getCountryByCode, getDataVersion } from '../../data/loader.js';
 import { calculateSimulation } from '../../core/simulations.js';
 import type { SimulationParameters, TargetGroup } from '../../core/types.js';
 
-const VALID_TARGET_GROUPS: TargetGroup[] = ['all', 'bottom_quintile'];
+const VALID_TARGET_GROUPS: TargetGroup[] = ['all', 'bottom_decile', 'bottom_quintile', 'bottom_third', 'bottom_half'];
 const COMPARE_MAX_COUNTRIES = 20;
 
 function parseSimulationBody(body: Record<string, unknown>): {

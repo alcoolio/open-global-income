@@ -12,7 +12,7 @@ import { calculateSimulation } from '../../core/simulations.js';
 import { buildRegionAdjustedCountry, toRegionalEntitlement } from '../../core/regions.js';
 import type { SimulationParameters, TargetGroup } from '../../core/types.js';
 
-const VALID_TARGET_GROUPS: TargetGroup[] = ['all', 'bottom_quintile'];
+const VALID_TARGET_GROUPS: TargetGroup[] = ['all', 'bottom_decile', 'bottom_quintile', 'bottom_third', 'bottom_half'];
 
 export const regionsRoute: FastifyPluginAsync = async (app) => {
   /** List all regions, optionally filtered by country */
