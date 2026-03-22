@@ -90,10 +90,12 @@ export function buildServer(opts?: ServerOptions) {
   // Static files (CSS, JS) for admin UI
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
-  app.register(fastifyStatic, {
-    root: join(__dirname, '..', '..', 'public'),
-    prefix: '/',
-    decorateReply: false,
+  const publicRoot = join(__dirname, '..', '..', 'public');
+  app.register(async (scope) => {
+    scope.register(fastifyStatic, {
+      root: publicRoot,
+      prefix: '/',
+    });
   });
 
   // OpenAPI spec generation
