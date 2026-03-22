@@ -81,7 +81,10 @@ export function renderSimulatePage(
                 <label class="form-label">${t('simulate.targetGroup')}</label>
                 <select class="form-select" name="targetGroup">
                   <option value="all">${t('simulate.targetGroupAll')}</option>
+                  <option value="bottom_decile">${t('simulate.targetGroupBottomDecile')}</option>
                   <option value="bottom_quintile">${t('simulate.targetGroupBottomQuintile')}</option>
+                  <option value="bottom_third">${t('simulate.targetGroupBottomThird')}</option>
+                  <option value="bottom_half">${t('simulate.targetGroupBottomHalf')}</option>
                 </select>
               </div>
             </div>

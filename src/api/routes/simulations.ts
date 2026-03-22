@@ -10,7 +10,7 @@ import {
 import { dispatchEvent } from '../../webhooks/dispatcher.js';
 import type { SimulationParameters, TargetGroup } from '../../core/types.js';
 
-const VALID_TARGET_GROUPS: TargetGroup[] = ['all', 'bottom_quintile'];
+const VALID_TARGET_GROUPS: TargetGroup[] = ['all', 'bottom_decile', 'bottom_quintile', 'bottom_third', 'bottom_half'];
 
 export const simulationsRoute: FastifyPluginAsync = async (app) => {
   /** Save a simulation */

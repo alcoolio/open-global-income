@@ -5,6 +5,9 @@ import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import fastifyFormBody from '@fastify/formbody';
+import fastifyStatic from '@fastify/static';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { apiKeyAuth } from './middleware/api-key-auth.js';
 import { auditLog } from './middleware/audit-log.js';
 import { metricsMiddleware } from './middleware/metrics.js';
@@ -75,11 +78,23 @@ export function buildServer(opts?: ServerOptions) {
     max: rateLimitMax,
     timeWindow: rateLimitWindow,
     allowList: (req) =>
-      req.url === '/health' || (req.url?.startsWith('/admin') ?? false),
+      req.url === '/health' ||
+      (req.url?.startsWith('/admin') ?? false) ||
+      (req.url?.startsWith('/css') ?? false) ||
+      (req.url?.startsWith('/js') ?? false),
   });
 
   // Form body parser (for admin POST forms)
   app.register(fastifyFormBody);
+
+  // Static files (CSS, JS) for admin UI
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  app.register(fastifyStatic, {
+    root: join(__dirname, '..', '..', 'public'),
+    prefix: '/',
+    decorateReply: false,
+  });
 
   // OpenAPI spec generation
   app.register(fastifySwagger, {

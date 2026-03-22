@@ -170,7 +170,7 @@ export interface GlobalIncomeEntitlement {
 }
 
 /** Target group for budget simulation */
-export type TargetGroup = 'all' | 'bottom_quintile';
+export type TargetGroup = 'all' | 'bottom_decile' | 'bottom_quintile' | 'bottom_third' | 'bottom_half';
 
 /** Parameters for a budget simulation request */
 export interface SimulationParameters {
