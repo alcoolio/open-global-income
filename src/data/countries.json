@@ -1,251 +1,1672 @@
 {
-  "dataVersion": "worldbank-2023",
-  "source": "World Bank Open Data (GDP, GNI, PPP, Gini, Population) — most recent available year per indicator, primarily 2022–2023",
+  "dataVersion": "worldbank-2023-enriched",
+  "source": "World Bank Open Data, ILO WSPR 2022-2024, IMF GFS — most recent available year per indicator (2020–2023). Enriched offline.",
   "countries": [
     {
       "code": "US",
       "name": "United States",
-      "stats": { "gdpPerCapitaUsd": 76330, "gniPerCapitaUsd": 76370, "pppConversionFactor": 1.0, "giniIndex": 39.8, "population": 331900000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 76330,
+        "gniPerCapitaUsd": 76370,
+        "pppConversionFactor": 1,
+        "giniIndex": 39.8,
+        "population": 331900000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 24.3,
+        "socialProtectionSpendingPercentGdp": 6.5,
+        "inflationRate": 4.1,
+        "laborForceParticipation": 61.7,
+        "unemploymentRate": 3.6,
+        "governmentDebtPercentGdp": 123.4,
+        "socialContributionsPercentRevenue": 23.6,
+        "povertyHeadcountRatio": 1,
+        "gdpGrowthRate": 2.1,
+        "healthExpenditurePercentGdp": 16.6,
+        "educationExpenditurePercentGdp": 6,
+        "urbanizationRate": 82.7,
+        "socialProtectionCoveragePercent": 28.7,
+        "socialProtectionExpenditureIloPercentGdp": 7.5,
+        "pensionCoveragePercent": 92,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 13.8,
+          "vatPercentGdp": 0,
+          "tradeTaxPercentGdp": 0.3,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "DE",
       "name": "Germany",
-      "stats": { "gdpPerCapitaUsd": 51384, "gniPerCapitaUsd": 51640, "pppConversionFactor": 0.78, "giniIndex": 31.7, "population": 83800000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 51384,
+        "gniPerCapitaUsd": 51640,
+        "pppConversionFactor": 0.78,
+        "giniIndex": 31.7,
+        "population": 83800000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 23.5,
+        "socialProtectionSpendingPercentGdp": 11.2,
+        "inflationRate": 6.9,
+        "laborForceParticipation": 61.4,
+        "unemploymentRate": 3,
+        "governmentDebtPercentGdp": 66.1,
+        "socialContributionsPercentRevenue": 37.2,
+        "povertyHeadcountRatio": 0,
+        "gdpGrowthRate": 1.8,
+        "healthExpenditurePercentGdp": 12.8,
+        "educationExpenditurePercentGdp": 4.9,
+        "urbanizationRate": 77.5,
+        "socialProtectionCoveragePercent": 56.8,
+        "socialProtectionExpenditureIloPercentGdp": 14.2,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 96.9,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 11.7,
+          "vatPercentGdp": 7.2,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "GB",
       "name": "United Kingdom",
-      "stats": { "gdpPerCapitaUsd": 46125, "gniPerCapitaUsd": 46370, "pppConversionFactor": 0.69, "giniIndex": 35.1, "population": 67500000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 46125,
+        "gniPerCapitaUsd": 46370,
+        "pppConversionFactor": 0.69,
+        "giniIndex": 35.1,
+        "population": 67500000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 26.3,
+        "socialProtectionSpendingPercentGdp": 7.3,
+        "inflationRate": 7.9,
+        "laborForceParticipation": 62.5,
+        "unemploymentRate": 3.7,
+        "governmentDebtPercentGdp": 101.9,
+        "socialContributionsPercentRevenue": 18.9,
+        "povertyHeadcountRatio": 0.2,
+        "gdpGrowthRate": 4.3,
+        "healthExpenditurePercentGdp": 11.9,
+        "educationExpenditurePercentGdp": 5.5,
+        "urbanizationRate": 84.4,
+        "socialProtectionCoveragePercent": 50.4,
+        "socialProtectionExpenditureIloPercentGdp": 10.8,
+        "pensionCoveragePercent": 97.6,
+        "childBenefitCoveragePercent": 90,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 13.2,
+          "vatPercentGdp": 6.9,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "FR",
       "name": "France",
-      "stats": { "gdpPerCapitaUsd": 42330, "gniPerCapitaUsd": 42860, "pppConversionFactor": 0.73, "giniIndex": 32.4, "population": 67750000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 42330,
+        "gniPerCapitaUsd": 42860,
+        "pppConversionFactor": 0.73,
+        "giniIndex": 32.4,
+        "population": 67750000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 28.4,
+        "socialProtectionSpendingPercentGdp": 11.8,
+        "inflationRate": 5.2,
+        "laborForceParticipation": 55.5,
+        "unemploymentRate": 7.3,
+        "governmentDebtPercentGdp": 111.6,
+        "socialContributionsPercentRevenue": 35.8,
+        "povertyHeadcountRatio": 0,
+        "gdpGrowthRate": 2.5,
+        "healthExpenditurePercentGdp": 12.2,
+        "educationExpenditurePercentGdp": 5.5,
+        "urbanizationRate": 81.4,
+        "socialProtectionCoveragePercent": 68.4,
+        "socialProtectionExpenditureIloPercentGdp": 18.8,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 98.5,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 12.5,
+          "vatPercentGdp": 7.3,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "JP",
       "name": "Japan",
-      "stats": { "gdpPerCapitaUsd": 33815, "gniPerCapitaUsd": 42440, "pppConversionFactor": 104.2, "giniIndex": 32.9, "population": 125700000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 33815,
+        "gniPerCapitaUsd": 42440,
+        "pppConversionFactor": 104.2,
+        "giniIndex": 32.9,
+        "population": 125700000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 18.8,
+        "socialProtectionSpendingPercentGdp": 3.4,
+        "inflationRate": 3.3,
+        "laborForceParticipation": 62,
+        "unemploymentRate": 2.6,
+        "governmentDebtPercentGdp": 261.3,
+        "socialContributionsPercentRevenue": 40.1,
+        "povertyHeadcountRatio": 0.7,
+        "gdpGrowthRate": 1,
+        "healthExpenditurePercentGdp": 10.9,
+        "educationExpenditurePercentGdp": 3.4,
+        "urbanizationRate": 91.8,
+        "socialProtectionCoveragePercent": 56.6,
+        "socialProtectionExpenditureIloPercentGdp": 13,
+        "pensionCoveragePercent": 97.5,
+        "childBenefitCoveragePercent": 85,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 10,
+          "vatPercentGdp": 4.5,
+          "tradeTaxPercentGdp": 0.1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "CA",
       "name": "Canada",
-      "stats": { "gdpPerCapitaUsd": 52722, "gniPerCapitaUsd": 52960, "pppConversionFactor": 1.26, "giniIndex": 33.3, "population": 39600000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 52722,
+        "gniPerCapitaUsd": 52960,
+        "pppConversionFactor": 1.26,
+        "giniIndex": 33.3,
+        "population": 39600000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 27.8,
+        "socialProtectionSpendingPercentGdp": 5.2,
+        "inflationRate": 3.9,
+        "laborForceParticipation": 64.3,
+        "unemploymentRate": 5.3,
+        "governmentDebtPercentGdp": 106.7,
+        "socialContributionsPercentRevenue": 14.3,
+        "povertyHeadcountRatio": 0.5,
+        "gdpGrowthRate": 3.4,
+        "healthExpenditurePercentGdp": 12.2,
+        "educationExpenditurePercentGdp": 5.3,
+        "urbanizationRate": 81.6,
+        "socialProtectionCoveragePercent": 45.2,
+        "socialProtectionExpenditureIloPercentGdp": 9.4,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 87,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 16.2,
+          "vatPercentGdp": 4.4,
+          "tradeTaxPercentGdp": 0.1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "AU",
       "name": "Australia",
-      "stats": { "gdpPerCapitaUsd": 63487, "gniPerCapitaUsd": 59700, "pppConversionFactor": 1.51, "giniIndex": 34.3, "population": 26400000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 63487,
+        "gniPerCapitaUsd": 59700,
+        "pppConversionFactor": 1.51,
+        "giniIndex": 34.3,
+        "population": 26400000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 27.5,
+        "socialProtectionSpendingPercentGdp": 5.3,
+        "inflationRate": 6.6,
+        "laborForceParticipation": 66.3,
+        "unemploymentRate": 3.7,
+        "governmentDebtPercentGdp": 52.7,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 0.7,
+        "gdpGrowthRate": 3.7,
+        "healthExpenditurePercentGdp": 10,
+        "educationExpenditurePercentGdp": 6.1,
+        "urbanizationRate": 86.2,
+        "socialProtectionCoveragePercent": 43.8,
+        "socialProtectionExpenditureIloPercentGdp": 8.6,
+        "pensionCoveragePercent": 76.1,
+        "childBenefitCoveragePercent": 67.5,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 16.3,
+          "vatPercentGdp": 4.5,
+          "tradeTaxPercentGdp": 0.3,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "KR",
       "name": "South Korea",
-      "stats": { "gdpPerCapitaUsd": 32423, "gniPerCapitaUsd": 35990, "pppConversionFactor": 876.6, "giniIndex": 31.4, "population": 51740000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 32423,
+        "gniPerCapitaUsd": 35990,
+        "pppConversionFactor": 876.6,
+        "giniIndex": 31.4,
+        "population": 51740000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 20,
+        "socialProtectionSpendingPercentGdp": 3.1,
+        "inflationRate": 3.6,
+        "laborForceParticipation": 63.9,
+        "unemploymentRate": 2.7,
+        "governmentDebtPercentGdp": 54.3,
+        "socialContributionsPercentRevenue": 24.7,
+        "povertyHeadcountRatio": 0.2,
+        "gdpGrowthRate": 2.6,
+        "healthExpenditurePercentGdp": 8.4,
+        "educationExpenditurePercentGdp": 4.7,
+        "urbanizationRate": 81.4,
+        "socialProtectionCoveragePercent": 38.7,
+        "socialProtectionExpenditureIloPercentGdp": 7,
+        "pensionCoveragePercent": 54.2,
+        "childBenefitCoveragePercent": 65.3,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 9.2,
+          "vatPercentGdp": 4.3,
+          "tradeTaxPercentGdp": 0.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "IT",
       "name": "Italy",
-      "stats": { "gdpPerCapitaUsd": 34085, "gniPerCapitaUsd": 36560, "pppConversionFactor": 0.66, "giniIndex": 35.2, "population": 58940000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 34085,
+        "gniPerCapitaUsd": 36560,
+        "pppConversionFactor": 0.66,
+        "giniIndex": 35.2,
+        "population": 58940000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 29,
+        "socialProtectionSpendingPercentGdp": 10.8,
+        "inflationRate": 5.7,
+        "laborForceParticipation": 50.5,
+        "unemploymentRate": 7.7,
+        "governmentDebtPercentGdp": 140.6,
+        "socialContributionsPercentRevenue": 30.2,
+        "povertyHeadcountRatio": 1.2,
+        "gdpGrowthRate": 3.7,
+        "healthExpenditurePercentGdp": 9,
+        "educationExpenditurePercentGdp": 4.3,
+        "urbanizationRate": 71.3,
+        "socialProtectionCoveragePercent": 54.3,
+        "socialProtectionExpenditureIloPercentGdp": 16.9,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 57.7,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 14.5,
+          "vatPercentGdp": 6.3,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "ES",
       "name": "Spain",
-      "stats": { "gdpPerCapitaUsd": 29674, "gniPerCapitaUsd": 30030, "pppConversionFactor": 0.65, "giniIndex": 33.0, "population": 47780000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 29674,
+        "gniPerCapitaUsd": 30030,
+        "pppConversionFactor": 0.65,
+        "giniIndex": 33,
+        "population": 47780000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 22.5,
+        "socialProtectionSpendingPercentGdp": 8.4,
+        "inflationRate": 3.5,
+        "laborForceParticipation": 58.3,
+        "unemploymentRate": 12.9,
+        "governmentDebtPercentGdp": 111.6,
+        "socialContributionsPercentRevenue": 33.5,
+        "povertyHeadcountRatio": 1,
+        "gdpGrowthRate": 5.8,
+        "healthExpenditurePercentGdp": 10.3,
+        "educationExpenditurePercentGdp": 4.3,
+        "urbanizationRate": 80.8,
+        "socialProtectionCoveragePercent": 50.1,
+        "socialProtectionExpenditureIloPercentGdp": 12.7,
+        "pensionCoveragePercent": 87.1,
+        "childBenefitCoveragePercent": 51.3,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 10.8,
+          "vatPercentGdp": 6.3,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "NL",
       "name": "Netherlands",
-      "stats": { "gdpPerCapitaUsd": 57025, "gniPerCapitaUsd": 56570, "pppConversionFactor": 0.79, "giniIndex": 28.5, "population": 17590000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 57025,
+        "gniPerCapitaUsd": 56570,
+        "pppConversionFactor": 0.79,
+        "giniIndex": 28.5,
+        "population": 17590000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 25.4,
+        "socialProtectionSpendingPercentGdp": 6,
+        "inflationRate": 4.2,
+        "laborForceParticipation": 65.1,
+        "unemploymentRate": 3.5,
+        "governmentDebtPercentGdp": 50.1,
+        "socialContributionsPercentRevenue": 31.3,
+        "povertyHeadcountRatio": 0.2,
+        "gdpGrowthRate": 4.3,
+        "healthExpenditurePercentGdp": 11.2,
+        "educationExpenditurePercentGdp": 5.2,
+        "urbanizationRate": 92.5,
+        "socialProtectionCoveragePercent": 62.3,
+        "socialProtectionExpenditureIloPercentGdp": 12.4,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 100,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 12.2,
+          "vatPercentGdp": 6.9,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "CH",
       "name": "Switzerland",
-      "stats": { "gdpPerCapitaUsd": 92434, "gniPerCapitaUsd": 90600, "pppConversionFactor": 1.21, "giniIndex": 33.1, "population": 8850000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 92434,
+        "gniPerCapitaUsd": 90600,
+        "pppConversionFactor": 1.21,
+        "giniIndex": 33.1,
+        "population": 8850000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 27.8,
+        "socialProtectionSpendingPercentGdp": 4.1,
+        "inflationRate": 2.8,
+        "laborForceParticipation": 68.4,
+        "unemploymentRate": 4.3,
+        "governmentDebtPercentGdp": 38.3,
+        "socialContributionsPercentRevenue": 21.2,
+        "povertyHeadcountRatio": 0,
+        "gdpGrowthRate": 2.7,
+        "healthExpenditurePercentGdp": 11.8,
+        "educationExpenditurePercentGdp": 5,
+        "urbanizationRate": 73.9,
+        "socialProtectionCoveragePercent": 56.4,
+        "socialProtectionExpenditureIloPercentGdp": 13.3,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 95,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 13.5,
+          "vatPercentGdp": 3.5,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "SE",
       "name": "Sweden",
-      "stats": { "gdpPerCapitaUsd": 55543, "gniPerCapitaUsd": 59440, "pppConversionFactor": 9.46, "giniIndex": 30.0, "population": 10490000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 55543,
+        "gniPerCapitaUsd": 59440,
+        "pppConversionFactor": 9.46,
+        "giniIndex": 30,
+        "population": 10490000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 34,
+        "socialProtectionSpendingPercentGdp": 5.7,
+        "inflationRate": 8.5,
+        "laborForceParticipation": 64.9,
+        "unemploymentRate": 7.5,
+        "governmentDebtPercentGdp": 33.2,
+        "socialContributionsPercentRevenue": 17.8,
+        "povertyHeadcountRatio": 0.6,
+        "gdpGrowthRate": 2.6,
+        "healthExpenditurePercentGdp": 11.4,
+        "educationExpenditurePercentGdp": 7.6,
+        "urbanizationRate": 88.2,
+        "socialProtectionCoveragePercent": 65.9,
+        "socialProtectionExpenditureIloPercentGdp": 14.1,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 100,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 17.9,
+          "vatPercentGdp": 9.3,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "NO",
       "name": "Norway",
-      "stats": { "gdpPerCapitaUsd": 87925, "gniPerCapitaUsd": 87210, "pppConversionFactor": 10.73, "giniIndex": 27.7, "population": 5460000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 87925,
+        "gniPerCapitaUsd": 87210,
+        "pppConversionFactor": 10.73,
+        "giniIndex": 27.7,
+        "population": 5460000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 38.1,
+        "socialProtectionSpendingPercentGdp": 5,
+        "inflationRate": 5.8,
+        "laborForceParticipation": 66,
+        "unemploymentRate": 3.2,
+        "governmentDebtPercentGdp": 42.4,
+        "socialContributionsPercentRevenue": 22,
+        "povertyHeadcountRatio": 0.2,
+        "gdpGrowthRate": 3.3,
+        "healthExpenditurePercentGdp": 11.3,
+        "educationExpenditurePercentGdp": 7.6,
+        "urbanizationRate": 83.4,
+        "socialProtectionCoveragePercent": 59.1,
+        "socialProtectionExpenditureIloPercentGdp": 15,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 100,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 21.2,
+          "vatPercentGdp": 8,
+          "tradeTaxPercentGdp": 0.1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "SG",
       "name": "Singapore",
-      "stats": { "gdpPerCapitaUsd": 65233, "gniPerCapitaUsd": 64010, "pppConversionFactor": 0.84, "giniIndex": null, "population": 5640000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 65233,
+        "gniPerCapitaUsd": 64010,
+        "pppConversionFactor": 0.84,
+        "giniIndex": null,
+        "population": 5640000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 14.1,
+        "socialProtectionSpendingPercentGdp": 1.8,
+        "inflationRate": 4.8,
+        "laborForceParticipation": 69.8,
+        "unemploymentRate": 2.1,
+        "governmentDebtPercentGdp": 167.8,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": null,
+        "gdpGrowthRate": 3.6,
+        "healthExpenditurePercentGdp": 5,
+        "educationExpenditurePercentGdp": 2.9,
+        "urbanizationRate": 100,
+        "socialProtectionCoveragePercent": 25,
+        "socialProtectionExpenditureIloPercentGdp": 3.5,
+        "pensionCoveragePercent": 45,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 7.8,
+          "vatPercentGdp": 3.1,
+          "tradeTaxPercentGdp": 0,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "IL",
       "name": "Israel",
-      "stats": { "gdpPerCapitaUsd": 52170, "gniPerCapitaUsd": 49840, "pppConversionFactor": 3.73, "giniIndex": 39.0, "population": 9560000, "incomeGroup": "HIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 52170,
+        "gniPerCapitaUsd": 49840,
+        "pppConversionFactor": 3.73,
+        "giniIndex": 39,
+        "population": 9560000,
+        "incomeGroup": "HIC",
+        "taxRevenuePercentGdp": 24.4,
+        "socialProtectionSpendingPercentGdp": 4.2,
+        "inflationRate": 4.3,
+        "laborForceParticipation": 63.2,
+        "unemploymentRate": 3.4,
+        "governmentDebtPercentGdp": 60.7,
+        "socialContributionsPercentRevenue": 10.5,
+        "povertyHeadcountRatio": 0.5,
+        "gdpGrowthRate": 6.5,
+        "healthExpenditurePercentGdp": 8.3,
+        "educationExpenditurePercentGdp": 7.5,
+        "urbanizationRate": 92.8,
+        "socialProtectionCoveragePercent": 35.5,
+        "socialProtectionExpenditureIloPercentGdp": 5.4,
+        "pensionCoveragePercent": 100,
+        "childBenefitCoveragePercent": 68,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 11,
+          "vatPercentGdp": 7.5,
+          "tradeTaxPercentGdp": 0.1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "CN",
       "name": "China",
-      "stats": { "gdpPerCapitaUsd": 12720, "gniPerCapitaUsd": 12850, "pppConversionFactor": 3.99, "giniIndex": 38.2, "population": 1412000000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 12720,
+        "gniPerCapitaUsd": 12850,
+        "pppConversionFactor": 3.99,
+        "giniIndex": 38.2,
+        "population": 1412000000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 14.3,
+        "socialProtectionSpendingPercentGdp": 3.8,
+        "inflationRate": 2,
+        "laborForceParticipation": 67.4,
+        "unemploymentRate": 4.5,
+        "governmentDebtPercentGdp": 77.1,
+        "socialContributionsPercentRevenue": 17.4,
+        "povertyHeadcountRatio": 0.1,
+        "gdpGrowthRate": 5.2,
+        "healthExpenditurePercentGdp": 5.6,
+        "educationExpenditurePercentGdp": 3.6,
+        "urbanizationRate": 64.7,
+        "socialProtectionCoveragePercent": 36.5,
+        "socialProtectionExpenditureIloPercentGdp": 7.2,
+        "pensionCoveragePercent": 44,
+        "childBenefitCoveragePercent": 11.7,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 4.4,
+          "vatPercentGdp": 5.6,
+          "tradeTaxPercentGdp": 0.3,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "BR",
       "name": "Brazil",
-      "stats": { "gdpPerCapitaUsd": 8920, "gniPerCapitaUsd": 9140, "pppConversionFactor": 2.55, "giniIndex": 48.9, "population": 214300000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 8920,
+        "gniPerCapitaUsd": 9140,
+        "pppConversionFactor": 2.55,
+        "giniIndex": 48.9,
+        "population": 214300000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 21.6,
+        "socialProtectionSpendingPercentGdp": 8.3,
+        "inflationRate": 4.6,
+        "laborForceParticipation": 62.3,
+        "unemploymentRate": 7.9,
+        "governmentDebtPercentGdp": 73.5,
+        "socialContributionsPercentRevenue": 21.8,
+        "povertyHeadcountRatio": 5.8,
+        "gdpGrowthRate": 2.9,
+        "healthExpenditurePercentGdp": 9.9,
+        "educationExpenditurePercentGdp": 6.3,
+        "urbanizationRate": 87.6,
+        "socialProtectionCoveragePercent": 31.7,
+        "socialProtectionExpenditureIloPercentGdp": 13,
+        "pensionCoveragePercent": 86.4,
+        "childBenefitCoveragePercent": 56.4,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 7.8,
+          "vatPercentGdp": 7.2,
+          "tradeTaxPercentGdp": 0.6,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "MX",
       "name": "Mexico",
-      "stats": { "gdpPerCapitaUsd": 10820, "gniPerCapitaUsd": 10820, "pppConversionFactor": 9.35, "giniIndex": 45.4, "population": 127500000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 10820,
+        "gniPerCapitaUsd": 10820,
+        "pppConversionFactor": 9.35,
+        "giniIndex": 45.4,
+        "population": 127500000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 14.5,
+        "socialProtectionSpendingPercentGdp": 4.1,
+        "inflationRate": 5.5,
+        "laborForceParticipation": 60,
+        "unemploymentRate": 3.3,
+        "governmentDebtPercentGdp": 54.2,
+        "socialContributionsPercentRevenue": 14,
+        "povertyHeadcountRatio": 3.2,
+        "gdpGrowthRate": 3.9,
+        "healthExpenditurePercentGdp": 5.5,
+        "educationExpenditurePercentGdp": 4.3,
+        "urbanizationRate": 80.7,
+        "socialProtectionCoveragePercent": 25.6,
+        "socialProtectionExpenditureIloPercentGdp": 3.9,
+        "pensionCoveragePercent": 26.5,
+        "childBenefitCoveragePercent": 9.2,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 6,
+          "vatPercentGdp": 3.8,
+          "tradeTaxPercentGdp": 0.2,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "TR",
       "name": "Turkey",
-      "stats": { "gdpPerCapitaUsd": 10674, "gniPerCapitaUsd": 10940, "pppConversionFactor": 5.14, "giniIndex": 43.5, "population": 85280000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 10674,
+        "gniPerCapitaUsd": 10940,
+        "pppConversionFactor": 5.14,
+        "giniIndex": 43.5,
+        "population": 85280000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 16.9,
+        "socialProtectionSpendingPercentGdp": 4.1,
+        "inflationRate": 72.3,
+        "laborForceParticipation": 53,
+        "unemploymentRate": 9.4,
+        "governmentDebtPercentGdp": 31.7,
+        "socialContributionsPercentRevenue": 16.3,
+        "povertyHeadcountRatio": 0.1,
+        "gdpGrowthRate": 5.5,
+        "healthExpenditurePercentGdp": 4.6,
+        "educationExpenditurePercentGdp": 3.4,
+        "urbanizationRate": 76.6,
+        "socialProtectionCoveragePercent": 34.5,
+        "socialProtectionExpenditureIloPercentGdp": 7.1,
+        "pensionCoveragePercent": 74.2,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 5.4,
+          "vatPercentGdp": 5.6,
+          "tradeTaxPercentGdp": 0.1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "TH",
       "name": "Thailand",
-      "stats": { "gdpPerCapitaUsd": 7233, "gniPerCapitaUsd": 7060, "pppConversionFactor": 12.05, "giniIndex": 34.9, "population": 71800000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 7233,
+        "gniPerCapitaUsd": 7060,
+        "pppConversionFactor": 12.05,
+        "giniIndex": 34.9,
+        "population": 71800000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 15.6,
+        "socialProtectionSpendingPercentGdp": 3.3,
+        "inflationRate": 6.1,
+        "laborForceParticipation": 67.3,
+        "unemploymentRate": 1,
+        "governmentDebtPercentGdp": 61.2,
+        "socialContributionsPercentRevenue": 2.5,
+        "povertyHeadcountRatio": 0,
+        "gdpGrowthRate": 2.6,
+        "healthExpenditurePercentGdp": 4.4,
+        "educationExpenditurePercentGdp": 3.2,
+        "urbanizationRate": 52,
+        "socialProtectionCoveragePercent": 33,
+        "socialProtectionExpenditureIloPercentGdp": 4.6,
+        "pensionCoveragePercent": 72.2,
+        "childBenefitCoveragePercent": 12.3,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 5.9,
+          "vatPercentGdp": 4.5,
+          "tradeTaxPercentGdp": 0.7,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "MY",
       "name": "Malaysia",
-      "stats": { "gdpPerCapitaUsd": 11993, "gniPerCapitaUsd": 11780, "pppConversionFactor": 1.58, "giniIndex": 41.2, "population": 33570000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 11993,
+        "gniPerCapitaUsd": 11780,
+        "pppConversionFactor": 1.58,
+        "giniIndex": 41.2,
+        "population": 33570000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 12.1,
+        "socialProtectionSpendingPercentGdp": 2.2,
+        "inflationRate": 3.4,
+        "laborForceParticipation": 69.1,
+        "unemploymentRate": 3.6,
+        "governmentDebtPercentGdp": 66.3,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 0,
+        "gdpGrowthRate": 8.7,
+        "healthExpenditurePercentGdp": 4.1,
+        "educationExpenditurePercentGdp": 3.9,
+        "urbanizationRate": 78,
+        "socialProtectionCoveragePercent": 22.5,
+        "socialProtectionExpenditureIloPercentGdp": 2,
+        "pensionCoveragePercent": 30,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 6.5,
+          "vatPercentGdp": 0,
+          "tradeTaxPercentGdp": 0.7,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "ZA",
       "name": "South Africa",
-      "stats": { "gdpPerCapitaUsd": 6190, "gniPerCapitaUsd": 6010, "pppConversionFactor": 6.76, "giniIndex": 63.0, "population": 60400000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 6190,
+        "gniPerCapitaUsd": 6010,
+        "pppConversionFactor": 6.76,
+        "giniIndex": 63,
+        "population": 60400000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 25.5,
+        "socialProtectionSpendingPercentGdp": 4.4,
+        "inflationRate": 6.9,
+        "laborForceParticipation": 55.5,
+        "unemploymentRate": 32.9,
+        "governmentDebtPercentGdp": 71.1,
+        "socialContributionsPercentRevenue": 2.3,
+        "povertyHeadcountRatio": 18.9,
+        "gdpGrowthRate": 1.9,
+        "healthExpenditurePercentGdp": 9.1,
+        "educationExpenditurePercentGdp": 6.6,
+        "urbanizationRate": 68,
+        "socialProtectionCoveragePercent": 23.1,
+        "socialProtectionExpenditureIloPercentGdp": 3.5,
+        "pensionCoveragePercent": 79.8,
+        "childBenefitCoveragePercent": 65.6,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 14.3,
+          "vatPercentGdp": 7.2,
+          "tradeTaxPercentGdp": 0.4,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "CO",
       "name": "Colombia",
-      "stats": { "gdpPerCapitaUsd": 6630, "gniPerCapitaUsd": 6350, "pppConversionFactor": 1714.0, "giniIndex": 51.5, "population": 51870000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 6630,
+        "gniPerCapitaUsd": 6350,
+        "pppConversionFactor": 1714,
+        "giniIndex": 51.5,
+        "population": 51870000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 14.4,
+        "socialProtectionSpendingPercentGdp": 5.4,
+        "inflationRate": 10.2,
+        "laborForceParticipation": 63.7,
+        "unemploymentRate": 11.2,
+        "governmentDebtPercentGdp": 59.4,
+        "socialContributionsPercentRevenue": 3.3,
+        "povertyHeadcountRatio": 4.6,
+        "gdpGrowthRate": 7.3,
+        "healthExpenditurePercentGdp": 8.1,
+        "educationExpenditurePercentGdp": 4.9,
+        "urbanizationRate": 81.8,
+        "socialProtectionCoveragePercent": 24.9,
+        "socialProtectionExpenditureIloPercentGdp": 5.7,
+        "pensionCoveragePercent": 26,
+        "childBenefitCoveragePercent": 14.2,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 5.1,
+          "vatPercentGdp": 4.5,
+          "tradeTaxPercentGdp": 0.3,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "AR",
       "name": "Argentina",
-      "stats": { "gdpPerCapitaUsd": 13650, "gniPerCapitaUsd": 12500, "pppConversionFactor": 94.5, "giniIndex": 42.3, "population": 46300000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 13650,
+        "gniPerCapitaUsd": 12500,
+        "pppConversionFactor": 94.5,
+        "giniIndex": 42.3,
+        "population": 46300000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 12.4,
+        "socialProtectionSpendingPercentGdp": 7.9,
+        "inflationRate": 72.4,
+        "laborForceParticipation": 60.6,
+        "unemploymentRate": 6.8,
+        "governmentDebtPercentGdp": 84.7,
+        "socialContributionsPercentRevenue": 22.3,
+        "povertyHeadcountRatio": 2.5,
+        "gdpGrowthRate": 5,
+        "healthExpenditurePercentGdp": 9.6,
+        "educationExpenditurePercentGdp": 5,
+        "urbanizationRate": 92.2,
+        "socialProtectionCoveragePercent": 41.2,
+        "socialProtectionExpenditureIloPercentGdp": 11.5,
+        "pensionCoveragePercent": 89.7,
+        "childBenefitCoveragePercent": 58.5,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 3.2,
+          "vatPercentGdp": 5,
+          "tradeTaxPercentGdp": 0.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "PE",
       "name": "Peru",
-      "stats": { "gdpPerCapitaUsd": 7126, "gniPerCapitaUsd": 6960, "pppConversionFactor": 1.73, "giniIndex": 40.2, "population": 34050000, "incomeGroup": "UMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 7126,
+        "gniPerCapitaUsd": 6960,
+        "pppConversionFactor": 1.73,
+        "giniIndex": 40.2,
+        "population": 34050000,
+        "incomeGroup": "UMC",
+        "taxRevenuePercentGdp": 14.9,
+        "socialProtectionSpendingPercentGdp": 3.2,
+        "inflationRate": 7.9,
+        "laborForceParticipation": 74.5,
+        "unemploymentRate": 3.6,
+        "governmentDebtPercentGdp": 33.8,
+        "socialContributionsPercentRevenue": 9.3,
+        "povertyHeadcountRatio": 3.6,
+        "gdpGrowthRate": 2.7,
+        "healthExpenditurePercentGdp": 5.3,
+        "educationExpenditurePercentGdp": 4.2,
+        "urbanizationRate": 78.3,
+        "socialProtectionCoveragePercent": 20.3,
+        "socialProtectionExpenditureIloPercentGdp": 3,
+        "pensionCoveragePercent": 37.8,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 5.8,
+          "vatPercentGdp": 4.8,
+          "tradeTaxPercentGdp": 0.2,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "IN",
       "name": "India",
-      "stats": { "gdpPerCapitaUsd": 2485, "gniPerCapitaUsd": 2390, "pppConversionFactor": 22.88, "giniIndex": 35.7, "population": 1417200000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 2485,
+        "gniPerCapitaUsd": 2390,
+        "pppConversionFactor": 22.88,
+        "giniIndex": 35.7,
+        "population": 1417200000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 11.2,
+        "socialProtectionSpendingPercentGdp": 1.3,
+        "inflationRate": 6.7,
+        "laborForceParticipation": 49.8,
+        "unemploymentRate": 4.8,
+        "governmentDebtPercentGdp": 83.2,
+        "socialContributionsPercentRevenue": 1.1,
+        "povertyHeadcountRatio": 12.9,
+        "gdpGrowthRate": 7.2,
+        "healthExpenditurePercentGdp": 3.3,
+        "educationExpenditurePercentGdp": 4.5,
+        "urbanizationRate": 35.4,
+        "socialProtectionCoveragePercent": 24.4,
+        "socialProtectionExpenditureIloPercentGdp": 1.4,
+        "pensionCoveragePercent": 27.7,
+        "childBenefitCoveragePercent": 10.3,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 5.3,
+          "vatPercentGdp": 3.4,
+          "tradeTaxPercentGdp": 0.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "ID",
       "name": "Indonesia",
-      "stats": { "gdpPerCapitaUsd": 4788, "gniPerCapitaUsd": 4580, "pppConversionFactor": 5145.0, "giniIndex": 37.9, "population": 275500000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 4788,
+        "gniPerCapitaUsd": 4580,
+        "pppConversionFactor": 5145,
+        "giniIndex": 37.9,
+        "population": 275500000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 10.9,
+        "socialProtectionSpendingPercentGdp": 1.2,
+        "inflationRate": 4.2,
+        "laborForceParticipation": 67.5,
+        "unemploymentRate": 3.5,
+        "governmentDebtPercentGdp": 39.4,
+        "socialContributionsPercentRevenue": 3.2,
+        "povertyHeadcountRatio": 2.5,
+        "gdpGrowthRate": 5.3,
+        "healthExpenditurePercentGdp": 2.9,
+        "educationExpenditurePercentGdp": 3.5,
+        "urbanizationRate": 57.9,
+        "socialProtectionCoveragePercent": 14.5,
+        "socialProtectionExpenditureIloPercentGdp": 1.1,
+        "pensionCoveragePercent": 13.3,
+        "childBenefitCoveragePercent": 4.5,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 4.7,
+          "vatPercentGdp": 2.7,
+          "tradeTaxPercentGdp": 0.2,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "PH",
       "name": "Philippines",
-      "stats": { "gdpPerCapitaUsd": 3498, "gniPerCapitaUsd": 3950, "pppConversionFactor": 19.07, "giniIndex": 42.3, "population": 115600000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 3498,
+        "gniPerCapitaUsd": 3950,
+        "pppConversionFactor": 19.07,
+        "giniIndex": 42.3,
+        "population": 115600000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 15.2,
+        "socialProtectionSpendingPercentGdp": 1.9,
+        "inflationRate": 5.8,
+        "laborForceParticipation": 60.8,
+        "unemploymentRate": 4.3,
+        "governmentDebtPercentGdp": 60.9,
+        "socialContributionsPercentRevenue": 5.2,
+        "povertyHeadcountRatio": 3,
+        "gdpGrowthRate": 7.6,
+        "healthExpenditurePercentGdp": 5,
+        "educationExpenditurePercentGdp": 3.5,
+        "urbanizationRate": 48,
+        "socialProtectionCoveragePercent": 19.9,
+        "socialProtectionExpenditureIloPercentGdp": 1.9,
+        "pensionCoveragePercent": 31,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 5.8,
+          "vatPercentGdp": 3.8,
+          "tradeTaxPercentGdp": 2.3,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "VN",
       "name": "Vietnam",
-      "stats": { "gdpPerCapitaUsd": 4164, "gniPerCapitaUsd": 4010, "pppConversionFactor": 8157.0, "giniIndex": 36.8, "population": 99460000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 4164,
+        "gniPerCapitaUsd": 4010,
+        "pppConversionFactor": 8157,
+        "giniIndex": 36.8,
+        "population": 99460000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 14.7,
+        "socialProtectionSpendingPercentGdp": 2.7,
+        "inflationRate": 3.2,
+        "laborForceParticipation": 76.1,
+        "unemploymentRate": 1.5,
+        "governmentDebtPercentGdp": 35.7,
+        "socialContributionsPercentRevenue": 7.4,
+        "povertyHeadcountRatio": 1,
+        "gdpGrowthRate": 8,
+        "healthExpenditurePercentGdp": 4.7,
+        "educationExpenditurePercentGdp": 4.1,
+        "urbanizationRate": 38.1,
+        "socialProtectionCoveragePercent": 33.4,
+        "socialProtectionExpenditureIloPercentGdp": 3.5,
+        "pensionCoveragePercent": 37.6,
+        "childBenefitCoveragePercent": 8.2,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 5,
+          "vatPercentGdp": 4.3,
+          "tradeTaxPercentGdp": 1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "EG",
       "name": "Egypt",
-      "stats": { "gdpPerCapitaUsd": 3699, "gniPerCapitaUsd": 3780, "pppConversionFactor": 4.87, "giniIndex": 31.5, "population": 104500000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 3699,
+        "gniPerCapitaUsd": 3780,
+        "pppConversionFactor": 4.87,
+        "giniIndex": 31.5,
+        "population": 104500000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 13.3,
+        "socialProtectionSpendingPercentGdp": 5.3,
+        "inflationRate": 24.4,
+        "laborForceParticipation": 42.4,
+        "unemploymentRate": 7.4,
+        "governmentDebtPercentGdp": 87.2,
+        "socialContributionsPercentRevenue": 7.1,
+        "povertyHeadcountRatio": 3.8,
+        "gdpGrowthRate": 6.7,
+        "healthExpenditurePercentGdp": 4.4,
+        "educationExpenditurePercentGdp": 2.5,
+        "urbanizationRate": 42.8,
+        "socialProtectionCoveragePercent": 25.8,
+        "socialProtectionExpenditureIloPercentGdp": 6.8,
+        "pensionCoveragePercent": 33,
+        "childBenefitCoveragePercent": 13,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 3.8,
+          "vatPercentGdp": 3.5,
+          "tradeTaxPercentGdp": 0.7,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "BD",
       "name": "Bangladesh",
-      "stats": { "gdpPerCapitaUsd": 2688, "gniPerCapitaUsd": 2830, "pppConversionFactor": 34.41, "giniIndex": 32.4, "population": 169400000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 2688,
+        "gniPerCapitaUsd": 2830,
+        "pppConversionFactor": 34.41,
+        "giniIndex": 32.4,
+        "population": 169400000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 7.1,
+        "socialProtectionSpendingPercentGdp": 1,
+        "inflationRate": 9,
+        "laborForceParticipation": 56.7,
+        "unemploymentRate": 5.2,
+        "governmentDebtPercentGdp": 38.6,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 5,
+        "gdpGrowthRate": 6,
+        "healthExpenditurePercentGdp": 2.4,
+        "educationExpenditurePercentGdp": 1.8,
+        "urbanizationRate": 39.4,
+        "socialProtectionCoveragePercent": 28.4,
+        "socialProtectionExpenditureIloPercentGdp": 1.2,
+        "pensionCoveragePercent": 29,
+        "childBenefitCoveragePercent": 2.5,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 2,
+          "vatPercentGdp": 2.2,
+          "tradeTaxPercentGdp": 1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "PK",
       "name": "Pakistan",
-      "stats": { "gdpPerCapitaUsd": 1505, "gniPerCapitaUsd": 1560, "pppConversionFactor": 67.04, "giniIndex": 29.6, "population": 231400000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 1505,
+        "gniPerCapitaUsd": 1560,
+        "pppConversionFactor": 67.04,
+        "giniIndex": 29.6,
+        "population": 231400000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 10.4,
+        "socialProtectionSpendingPercentGdp": 1.5,
+        "inflationRate": 29.2,
+        "laborForceParticipation": 51.7,
+        "unemploymentRate": 6.3,
+        "governmentDebtPercentGdp": 77.8,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 4.9,
+        "gdpGrowthRate": 6.2,
+        "healthExpenditurePercentGdp": 3.4,
+        "educationExpenditurePercentGdp": 2.5,
+        "urbanizationRate": 37.2,
+        "socialProtectionCoveragePercent": 6.3,
+        "socialProtectionExpenditureIloPercentGdp": 0.4,
+        "pensionCoveragePercent": 5,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 2.8,
+          "vatPercentGdp": 3.5,
+          "tradeTaxPercentGdp": 1.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "KE",
       "name": "Kenya",
-      "stats": { "gdpPerCapitaUsd": 2099, "gniPerCapitaUsd": 2010, "pppConversionFactor": 49.37, "giniIndex": 38.7, "population": 54030000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 2099,
+        "gniPerCapitaUsd": 2010,
+        "pppConversionFactor": 49.37,
+        "giniIndex": 38.7,
+        "population": 54030000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 15,
+        "socialProtectionSpendingPercentGdp": 2,
+        "inflationRate": 7.7,
+        "laborForceParticipation": 72.3,
+        "unemploymentRate": 5.6,
+        "governmentDebtPercentGdp": 68.5,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 36.1,
+        "gdpGrowthRate": 5.6,
+        "healthExpenditurePercentGdp": 4.6,
+        "educationExpenditurePercentGdp": 5.3,
+        "urbanizationRate": 28.7,
+        "socialProtectionCoveragePercent": 9.8,
+        "socialProtectionExpenditureIloPercentGdp": 0.8,
+        "pensionCoveragePercent": 5.5,
+        "childBenefitCoveragePercent": 4.7,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 6.5,
+          "vatPercentGdp": 4.4,
+          "tradeTaxPercentGdp": 0.8,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "GH",
       "name": "Ghana",
-      "stats": { "gdpPerCapitaUsd": 2363, "gniPerCapitaUsd": 2350, "pppConversionFactor": 3.38, "giniIndex": 43.5, "population": 33480000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 2363,
+        "gniPerCapitaUsd": 2350,
+        "pppConversionFactor": 3.38,
+        "giniIndex": 43.5,
+        "population": 33480000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 12.8,
+        "socialProtectionSpendingPercentGdp": 2.2,
+        "inflationRate": 31.9,
+        "laborForceParticipation": 66.8,
+        "unemploymentRate": 4.7,
+        "governmentDebtPercentGdp": 87.6,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 23.4,
+        "gdpGrowthRate": 3.1,
+        "healthExpenditurePercentGdp": 3.4,
+        "educationExpenditurePercentGdp": 4,
+        "urbanizationRate": 58.1,
+        "socialProtectionCoveragePercent": 11.5,
+        "socialProtectionExpenditureIloPercentGdp": 1.1,
+        "pensionCoveragePercent": 8,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 4.5,
+          "vatPercentGdp": 3.2,
+          "tradeTaxPercentGdp": 1.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "UA",
       "name": "Ukraine",
-      "stats": { "gdpPerCapitaUsd": 4534, "gniPerCapitaUsd": 4270, "pppConversionFactor": 10.22, "giniIndex": 25.6, "population": 37000000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 4534,
+        "gniPerCapitaUsd": 4270,
+        "pppConversionFactor": 10.22,
+        "giniIndex": 25.6,
+        "population": 37000000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 20.4,
+        "socialProtectionSpendingPercentGdp": 8.3,
+        "inflationRate": 12.4,
+        "laborForceParticipation": 56.1,
+        "unemploymentRate": 9.5,
+        "governmentDebtPercentGdp": 78.5,
+        "socialContributionsPercentRevenue": 33.9,
+        "povertyHeadcountRatio": 0.1,
+        "gdpGrowthRate": -29.1,
+        "healthExpenditurePercentGdp": 7.6,
+        "educationExpenditurePercentGdp": 5.4,
+        "urbanizationRate": 69.9,
+        "socialProtectionCoveragePercent": 48.3,
+        "socialProtectionExpenditureIloPercentGdp": 12,
+        "pensionCoveragePercent": 94.7,
+        "childBenefitCoveragePercent": 79.5,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 7.3,
+          "vatPercentGdp": 9.3,
+          "tradeTaxPercentGdp": 0.3,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "MA",
       "name": "Morocco",
-      "stats": { "gdpPerCapitaUsd": 3527, "gniPerCapitaUsd": 3250, "pppConversionFactor": 3.67, "giniIndex": 39.5, "population": 37080000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 3527,
+        "gniPerCapitaUsd": 3250,
+        "pppConversionFactor": 3.67,
+        "giniIndex": 39.5,
+        "population": 37080000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 22.2,
+        "socialProtectionSpendingPercentGdp": 4.7,
+        "inflationRate": 6.6,
+        "laborForceParticipation": 44.3,
+        "unemploymentRate": 11.8,
+        "governmentDebtPercentGdp": 71.6,
+        "socialContributionsPercentRevenue": 1.9,
+        "povertyHeadcountRatio": 1.2,
+        "gdpGrowthRate": 1.3,
+        "healthExpenditurePercentGdp": 5.3,
+        "educationExpenditurePercentGdp": 6.8,
+        "urbanizationRate": 64.6,
+        "socialProtectionCoveragePercent": 18.7,
+        "socialProtectionExpenditureIloPercentGdp": 4.5,
+        "pensionCoveragePercent": 20,
+        "childBenefitCoveragePercent": 15,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 7.2,
+          "vatPercentGdp": 6.2,
+          "tradeTaxPercentGdp": 0.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "MM",
       "name": "Myanmar",
-      "stats": { "gdpPerCapitaUsd": 1093, "gniPerCapitaUsd": 1050, "pppConversionFactor": 465.0, "giniIndex": 30.7, "population": 54410000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 1093,
+        "gniPerCapitaUsd": 1050,
+        "pppConversionFactor": 465,
+        "giniIndex": 30.7,
+        "population": 54410000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 4.8,
+        "socialProtectionSpendingPercentGdp": 0.6,
+        "inflationRate": 8.6,
+        "laborForceParticipation": 61.5,
+        "unemploymentRate": 1.6,
+        "governmentDebtPercentGdp": 60,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 1.4,
+        "gdpGrowthRate": 2,
+        "healthExpenditurePercentGdp": 4.8,
+        "educationExpenditurePercentGdp": 2.1,
+        "urbanizationRate": 31.4,
+        "socialProtectionCoveragePercent": 4.2,
+        "socialProtectionExpenditureIloPercentGdp": 0.3,
+        "pensionCoveragePercent": 2,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 1.5,
+          "vatPercentGdp": 0.5,
+          "tradeTaxPercentGdp": 0.4,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "NG",
       "name": "Nigeria",
-      "stats": { "gdpPerCapitaUsd": 2184, "gniPerCapitaUsd": 2140, "pppConversionFactor": 168.5, "giniIndex": 35.1, "population": 218500000, "incomeGroup": "LMC" }
+      "stats": {
+        "gdpPerCapitaUsd": 2184,
+        "gniPerCapitaUsd": 2140,
+        "pppConversionFactor": 168.5,
+        "giniIndex": 35.1,
+        "population": 218500000,
+        "incomeGroup": "LMC",
+        "taxRevenuePercentGdp": 4.3,
+        "socialProtectionSpendingPercentGdp": 0.5,
+        "inflationRate": 18.8,
+        "laborForceParticipation": 53.3,
+        "unemploymentRate": 4.1,
+        "governmentDebtPercentGdp": 38.8,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 30.9,
+        "gdpGrowthRate": 3.3,
+        "healthExpenditurePercentGdp": 3,
+        "educationExpenditurePercentGdp": null,
+        "urbanizationRate": 52.8,
+        "socialProtectionCoveragePercent": 3.5,
+        "socialProtectionExpenditureIloPercentGdp": 0.2,
+        "pensionCoveragePercent": 3,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 1.1,
+          "vatPercentGdp": 0.8,
+          "tradeTaxPercentGdp": 0.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "ET",
       "name": "Ethiopia",
-      "stats": { "gdpPerCapitaUsd": 1027, "gniPerCapitaUsd": 1020, "pppConversionFactor": 17.29, "giniIndex": 35.0, "population": 123400000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 1027,
+        "gniPerCapitaUsd": 1020,
+        "pppConversionFactor": 17.29,
+        "giniIndex": 35,
+        "population": 123400000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 5.5,
+        "socialProtectionSpendingPercentGdp": 1.6,
+        "inflationRate": 33.9,
+        "laborForceParticipation": 75.3,
+        "unemploymentRate": 3.5,
+        "governmentDebtPercentGdp": 37.4,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 30.8,
+        "gdpGrowthRate": 6.4,
+        "healthExpenditurePercentGdp": 3.5,
+        "educationExpenditurePercentGdp": 4.5,
+        "urbanizationRate": 22.2,
+        "socialProtectionCoveragePercent": 4.6,
+        "socialProtectionExpenditureIloPercentGdp": 0.3,
+        "pensionCoveragePercent": 2,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 2.5,
+          "vatPercentGdp": 2,
+          "tradeTaxPercentGdp": 0.8,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "CD",
       "name": "DR Congo",
-      "stats": { "gdpPerCapitaUsd": 654, "gniPerCapitaUsd": 590, "pppConversionFactor": 984.0, "giniIndex": 42.1, "population": 99010000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 654,
+        "gniPerCapitaUsd": 590,
+        "pppConversionFactor": 984,
+        "giniIndex": 42.1,
+        "population": 99010000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 6.4,
+        "socialProtectionSpendingPercentGdp": 0.8,
+        "inflationRate": 9.3,
+        "laborForceParticipation": 61.2,
+        "unemploymentRate": 4.5,
+        "governmentDebtPercentGdp": 16,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 72,
+        "gdpGrowthRate": 8.9,
+        "healthExpenditurePercentGdp": 3.8,
+        "educationExpenditurePercentGdp": 1.5,
+        "urbanizationRate": 46.6,
+        "socialProtectionCoveragePercent": 3.6,
+        "socialProtectionExpenditureIloPercentGdp": 0.2,
+        "pensionCoveragePercent": 2.5,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 2.1,
+          "vatPercentGdp": 1.5,
+          "tradeTaxPercentGdp": 1.2,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "MZ",
       "name": "Mozambique",
-      "stats": { "gdpPerCapitaUsd": 539, "gniPerCapitaUsd": 480, "pppConversionFactor": 26.5, "giniIndex": 54.0, "population": 32970000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 539,
+        "gniPerCapitaUsd": 480,
+        "pppConversionFactor": 26.5,
+        "giniIndex": 54,
+        "population": 32970000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 16.5,
+        "socialProtectionSpendingPercentGdp": 2.1,
+        "inflationRate": 9.8,
+        "laborForceParticipation": 78.1,
+        "unemploymentRate": 3.1,
+        "governmentDebtPercentGdp": 101.8,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 63.7,
+        "gdpGrowthRate": 4.2,
+        "healthExpenditurePercentGdp": 7.1,
+        "educationExpenditurePercentGdp": 5.6,
+        "urbanizationRate": 38,
+        "socialProtectionCoveragePercent": 5.5,
+        "socialProtectionExpenditureIloPercentGdp": 0.6,
+        "pensionCoveragePercent": 6,
+        "childBenefitCoveragePercent": 3,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 4.2,
+          "vatPercentGdp": 5.5,
+          "tradeTaxPercentGdp": 1.3,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "UG",
       "name": "Uganda",
-      "stats": { "gdpPerCapitaUsd": 964, "gniPerCapitaUsd": 930, "pppConversionFactor": 1258.0, "giniIndex": 42.7, "population": 47250000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 964,
+        "gniPerCapitaUsd": 930,
+        "pppConversionFactor": 1258,
+        "giniIndex": 42.7,
+        "population": 47250000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 10.1,
+        "socialProtectionSpendingPercentGdp": 1.2,
+        "inflationRate": 7.2,
+        "laborForceParticipation": 72.5,
+        "unemploymentRate": 2.9,
+        "governmentDebtPercentGdp": 48.4,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 42.2,
+        "gdpGrowthRate": 4.7,
+        "healthExpenditurePercentGdp": 3.6,
+        "educationExpenditurePercentGdp": 2.7,
+        "urbanizationRate": 25.6,
+        "socialProtectionCoveragePercent": 2.3,
+        "socialProtectionExpenditureIloPercentGdp": 0.2,
+        "pensionCoveragePercent": 3.6,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 3.5,
+          "vatPercentGdp": 3,
+          "tradeTaxPercentGdp": 0.8,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "AF",
       "name": "Afghanistan",
-      "stats": { "gdpPerCapitaUsd": 355, "gniPerCapitaUsd": 380, "pppConversionFactor": 25.07, "giniIndex": null, "population": 41100000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 355,
+        "gniPerCapitaUsd": 380,
+        "pppConversionFactor": 25.07,
+        "giniIndex": null,
+        "population": 41100000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 7.5,
+        "socialProtectionSpendingPercentGdp": 0.3,
+        "inflationRate": 10.2,
+        "laborForceParticipation": 45.8,
+        "unemploymentRate": 14.7,
+        "governmentDebtPercentGdp": 7.8,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 47.3,
+        "gdpGrowthRate": null,
+        "healthExpenditurePercentGdp": 13.3,
+        "educationExpenditurePercentGdp": 4.1,
+        "urbanizationRate": 26.3,
+        "socialProtectionCoveragePercent": 3,
+        "socialProtectionExpenditureIloPercentGdp": 0.2,
+        "pensionCoveragePercent": 2,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 1.5,
+          "vatPercentGdp": 0.5,
+          "tradeTaxPercentGdp": 2.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "MW",
       "name": "Malawi",
-      "stats": { "gdpPerCapitaUsd": 645, "gniPerCapitaUsd": 630, "pppConversionFactor": 372.0, "giniIndex": 44.7, "population": 19890000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 645,
+        "gniPerCapitaUsd": 630,
+        "pppConversionFactor": 372,
+        "giniIndex": 44.7,
+        "population": 19890000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 13.2,
+        "socialProtectionSpendingPercentGdp": 1.6,
+        "inflationRate": 21.7,
+        "laborForceParticipation": 75.3,
+        "unemploymentRate": 5.7,
+        "governmentDebtPercentGdp": 60.1,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 70.1,
+        "gdpGrowthRate": 0.8,
+        "healthExpenditurePercentGdp": 7.3,
+        "educationExpenditurePercentGdp": 3.8,
+        "urbanizationRate": 17.9,
+        "socialProtectionCoveragePercent": 5.5,
+        "socialProtectionExpenditureIloPercentGdp": 0.5,
+        "pensionCoveragePercent": 4,
+        "childBenefitCoveragePercent": 6,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 4.5,
+          "vatPercentGdp": 5.5,
+          "tradeTaxPercentGdp": 0.8,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "NE",
       "name": "Niger",
-      "stats": { "gdpPerCapitaUsd": 533, "gniPerCapitaUsd": 570, "pppConversionFactor": 237.0, "giniIndex": 37.3, "population": 25250000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 533,
+        "gniPerCapitaUsd": 570,
+        "pppConversionFactor": 237,
+        "giniIndex": 37.3,
+        "population": 25250000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 6.3,
+        "socialProtectionSpendingPercentGdp": 1.1,
+        "inflationRate": 4.2,
+        "laborForceParticipation": 67.5,
+        "unemploymentRate": 0.5,
+        "governmentDebtPercentGdp": 51.2,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 41.8,
+        "gdpGrowthRate": 11.5,
+        "healthExpenditurePercentGdp": 5.2,
+        "educationExpenditurePercentGdp": 3.5,
+        "urbanizationRate": 16.9,
+        "socialProtectionCoveragePercent": 2.6,
+        "socialProtectionExpenditureIloPercentGdp": 0.2,
+        "pensionCoveragePercent": 2.5,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 1.8,
+          "vatPercentGdp": 2,
+          "tradeTaxPercentGdp": 1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "TD",
       "name": "Chad",
-      "stats": { "gdpPerCapitaUsd": 694, "gniPerCapitaUsd": 700, "pppConversionFactor": 232.0, "giniIndex": 43.3, "population": 17720000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 694,
+        "gniPerCapitaUsd": 700,
+        "pppConversionFactor": 232,
+        "giniIndex": 43.3,
+        "population": 17720000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 5.1,
+        "socialProtectionSpendingPercentGdp": 0.5,
+        "inflationRate": 5.8,
+        "laborForceParticipation": 61.4,
+        "unemploymentRate": 1.9,
+        "governmentDebtPercentGdp": 42.5,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 33.2,
+        "gdpGrowthRate": 3.4,
+        "healthExpenditurePercentGdp": 4.3,
+        "educationExpenditurePercentGdp": 2.5,
+        "urbanizationRate": 23.8,
+        "socialProtectionCoveragePercent": 2,
+        "socialProtectionExpenditureIloPercentGdp": 0.1,
+        "pensionCoveragePercent": 1.5,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 1.2,
+          "vatPercentGdp": 1,
+          "tradeTaxPercentGdp": 1.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "BI",
       "name": "Burundi",
-      "stats": { "gdpPerCapitaUsd": 259, "gniPerCapitaUsd": 240, "pppConversionFactor": 741.0, "giniIndex": 38.6, "population": 12890000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 259,
+        "gniPerCapitaUsd": 240,
+        "pppConversionFactor": 741,
+        "giniIndex": 38.6,
+        "population": 12890000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 12.2,
+        "socialProtectionSpendingPercentGdp": 1.5,
+        "inflationRate": 18.8,
+        "laborForceParticipation": 80.2,
+        "unemploymentRate": 1.4,
+        "governmentDebtPercentGdp": 66.3,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 62.1,
+        "gdpGrowthRate": 1.8,
+        "healthExpenditurePercentGdp": 7.5,
+        "educationExpenditurePercentGdp": 5.1,
+        "urbanizationRate": 14,
+        "socialProtectionCoveragePercent": 3.7,
+        "socialProtectionExpenditureIloPercentGdp": 0.3,
+        "pensionCoveragePercent": 2,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 3,
+          "vatPercentGdp": 4,
+          "tradeTaxPercentGdp": 1,
+          "otherTaxPercentGdp": null
+        }
+      }
     },
     {
       "code": "SL",
       "name": "Sierra Leone",
-      "stats": { "gdpPerCapitaUsd": 527, "gniPerCapitaUsd": 490, "pppConversionFactor": 4578.0, "giniIndex": 35.7, "population": 8420000, "incomeGroup": "LIC" }
+      "stats": {
+        "gdpPerCapitaUsd": 527,
+        "gniPerCapitaUsd": 490,
+        "pppConversionFactor": 4578,
+        "giniIndex": 35.7,
+        "population": 8420000,
+        "incomeGroup": "LIC",
+        "taxRevenuePercentGdp": 8.6,
+        "socialProtectionSpendingPercentGdp": 1,
+        "inflationRate": 27.2,
+        "laborForceParticipation": 56.1,
+        "unemploymentRate": 4.3,
+        "governmentDebtPercentGdp": 70.1,
+        "socialContributionsPercentRevenue": 0,
+        "povertyHeadcountRatio": 26.1,
+        "gdpGrowthRate": 3.5,
+        "healthExpenditurePercentGdp": 8.8,
+        "educationExpenditurePercentGdp": 3.5,
+        "urbanizationRate": 43.1,
+        "socialProtectionCoveragePercent": 3.2,
+        "socialProtectionExpenditureIloPercentGdp": 0.4,
+        "pensionCoveragePercent": 3.5,
+        "childBenefitCoveragePercent": 0,
+        "taxBreakdown": {
+          "incomeTaxPercentGdp": 2.5,
+          "vatPercentGdp": 2,
+          "tradeTaxPercentGdp": 1.5,
+          "otherTaxPercentGdp": null
+        }
+      }
     }
   ]
 }
