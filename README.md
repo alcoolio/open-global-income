@@ -96,7 +96,7 @@ See [CLAUDE.md](./CLAUDE.md) for the full vision. See [ROADMAP.md](./ROADMAP.md)
 ### Clone & run locally
 
 ```bash
-git clone https://github.com/alcoolio/open-global-income.git
+git clone https://github.com/richardkfm/open-global-income.git
 cd open-global-income
 npm install
 npm run dev
