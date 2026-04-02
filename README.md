@@ -1,4 +1,21 @@
-# 🌍 Open Global Income
+```
+     ╔═══════════════════════════════════════════════════════╗
+     ║                                                       ║
+     ║        ██████╗  ██████╗ ██╗                           ║
+     ║       ██╔═══██╗██╔════╝ ██║                           ║
+     ║       ██║   ██║██║  ███╗██║                           ║
+     ║       ██║   ██║██║   ██║██║                           ║
+     ║       ╚██████╔╝╚██████╔╝██║                           ║
+     ║        ╚═════╝  ╚═════╝ ╚═╝                           ║
+     ║                                                       ║
+     ║   O P E N   G L O B A L   I N C O M E                ║
+     ║                                                       ║
+     ║   Shared infrastructure for universal basic income    ║
+     ║   ─────────────────────────────────────────────────   ║
+     ║   DATA → CALCULATION → SIMULATION → DISTRIBUTION     ║
+     ║                                                       ║
+     ╚═══════════════════════════════════════════════════════╝
+```
 
 **The shared infrastructure layer for universal basic income** — the neutral, auditable protocol that any government, NGO, or DAO can build on to deliver income floors to people.
 
