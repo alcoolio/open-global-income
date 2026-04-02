@@ -22,7 +22,8 @@
     "data:update:ilo": "tsx src/data/ilo/importer.ts",
     "data:update:imf": "tsx src/data/imf/importer.ts",
     "db:migrate": "tsx src/db/migrate.ts",
-    "sdk:generate": "tsx scripts/generate-sdk.ts"
+    "sdk:generate": "tsx scripts/generate-sdk.ts",
+    "postinstall": "node scripts/postinstall.js"
   },
   "keywords": [
     "global-income",
