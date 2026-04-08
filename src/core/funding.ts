@@ -7,6 +7,24 @@ import type {
   SimulationResult,
 } from './types.js';
 
+// ── Collection-effectiveness factors ──────────────────────────────────────
+
+/**
+ * Share of labor income that is effectively reachable by income tax,
+ * accounting for informal-economy size by income group.
+ *
+ * LIC/LMC economies have large informal sectors (smallholder agriculture,
+ * street trade, cash services) that sit outside the formal tax base.
+ * Sources: IMF Fiscal Monitor informality estimates; World Bank informality
+ * database.
+ */
+const INCOME_TAX_FORMALITY_FACTOR: Record<string, number> = {
+  HIC: 0.90, // ~10% informal
+  UMC: 0.70, // ~30% informal
+  LMC: 0.50, // ~50% informal
+  LIC: 0.35, // ~65% informal
+};
+
 // ── Proxy constants for mechanisms without direct data ─────────────────────
 
 /**
@@ -18,6 +36,27 @@ const WEALTH_TO_GDP_RATIO: Record<string, number> = {
   UMC: 2.5,
   LMC: 1.8,
   LIC: 1.2,
+};
+
+/**
+ * Effective collection rate for a wealth tax, accounting for avoidance,
+ * capital flight, and enforcement capacity.
+ *
+ * High-net-worth individuals use offshore structures, complex trusts, and
+ * asset reclassification to reduce taxable wealth. The few countries that
+ * have implemented wealth taxes (France, Sweden, Germany) observed actual
+ * revenues well below naive estimates; most eventually repealed the tax.
+ * Lower-income countries have weaker enforcement and greater capital
+ * mobility risk.
+ *
+ * Sources: IMF Working Paper WP/19/143 "Taxing Wealth"; OECD "The Role and
+ * Design of Net Wealth Taxes".
+ */
+const WEALTH_TAX_COLLECTION_FACTOR: Record<string, number> = {
+  HIC: 0.55, // strong institutions, but high capital mobility
+  UMC: 0.40,
+  LMC: 0.25,
+  LIC: 0.15, // limited enforcement, large informal wealth
 };
 
 /**
@@ -73,14 +112,16 @@ export function calcIncomeTaxSurcharge(
   rate: number,
 ): FundingEstimate {
   const lfp = (country.stats.laborForceParticipation ?? 60) / 100;
-  const revenueUsd = rate * country.stats.gniPerCapitaUsd * country.stats.population * lfp;
+  const formalityFactor = INCOME_TAX_FORMALITY_FACTOR[country.stats.incomeGroup] ?? 0.60;
+  const revenueUsd =
+    rate * country.stats.gniPerCapitaUsd * country.stats.population * lfp * formalityFactor;
   const revenuePpp = revenueUsd;
   const revenueLocal = revenuePpp * country.stats.pppConversionFactor;
 
   const assumptions = [
     `Income tax surcharge of ${(rate * 100).toFixed(1)}% applied to GNI per capita`,
     `Labor force participation: ${(lfp * 100).toFixed(1)}%${country.stats.laborForceParticipation == null ? ' (estimated, data unavailable)' : ''}`,
-    'Assumes uniform tax base across all employed individuals (simplified)',
+    `Formal-economy adjustment: ${(formalityFactor * 100).toFixed(0)}% of labor income is in the tax base (${country.stats.incomeGroup} informality estimate)`,
   ];
 
   return {
@@ -92,6 +133,20 @@ export function calcIncomeTaxSurcharge(
     assumptions,
   };
 }
+
+/**
+ * Behavioral response factor for VAT increases.
+ *
+ * When VAT rates rise, consumers reduce spending, substitute to
+ * lower-taxed goods, or shift to informal markets. Each percentage
+ * point of VAT increase therefore raises less than the naive
+ * proportional amount. Empirical estimates put the discount at
+ * 15–25% of theoretical yield.
+ *
+ * Source: IMF "Value Added Tax: Principles and Practice" (2011);
+ * Keen & Lockwood (2010) cross-country estimates.
+ */
+const VAT_BEHAVIORAL_DISCOUNT = 0.80; // 20% demand response
 
 /**
  * VAT increase.
@@ -117,7 +172,7 @@ export function calcVatIncrease(
     // But we don't know implied rate. Simpler: 1pp VAT ≈ vatShare × GDP / (standard rate ~15%)
     const impliedRate = 15; // typical VAT rate
     const vatRevenueUsd = (currentVatShare / 100) * gdpTotal;
-    revenueUsd = (points / impliedRate) * vatRevenueUsd;
+    revenueUsd = (points / impliedRate) * vatRevenueUsd * VAT_BEHAVIORAL_DISCOUNT;
     assumptions.push(
       `Current VAT revenue: ${currentVatShare.toFixed(1)}% of GDP`,
       `Assumed implied VAT rate of ~15% to estimate per-point revenue`,
@@ -125,7 +180,7 @@ export function calcVatIncrease(
   } else if (taxRevPct != null) {
     // Proxy: VAT is typically ~30% of total tax revenue
     const estimatedVatRevenue = (0.3 * taxRevPct / 100) * gdpTotal;
-    revenueUsd = (points / 15) * estimatedVatRevenue;
+    revenueUsd = (points / 15) * estimatedVatRevenue * VAT_BEHAVIORAL_DISCOUNT;
     assumptions.push(
       `VAT breakdown unavailable; estimated as 30% of total tax revenue (${taxRevPct.toFixed(1)}% of GDP)`,
       'Assumed implied VAT rate of ~15%',
@@ -135,14 +190,17 @@ export function calcVatIncrease(
     const vatPctProxy: Record<string, number> = { HIC: 7, UMC: 5, LMC: 4, LIC: 3 };
     const proxy = vatPctProxy[country.stats.incomeGroup] ?? 4;
     const estimatedVatRevenue = (proxy / 100) * gdpTotal;
-    revenueUsd = (points / 15) * estimatedVatRevenue;
+    revenueUsd = (points / 15) * estimatedVatRevenue * VAT_BEHAVIORAL_DISCOUNT;
     assumptions.push(
       `No tax data available; used income-group proxy VAT/GDP of ${proxy}%`,
       'Assumed implied VAT rate of ~15%',
     );
   }
 
-  assumptions.push(`VAT increase of ${points} percentage point(s)`);
+  assumptions.push(
+    `VAT increase of ${points} percentage point(s)`,
+    `Behavioral discount of 20% applied (demand response reduces yield below linear estimate)`,
+  );
 
   return {
     mechanism: 'vat_increase',
@@ -166,8 +224,10 @@ export function calcCarbonTax(
 ): FundingEstimate {
   const gdpTotal = country.stats.gdpPerCapitaUsd * country.stats.population;
   const co2PerThousand = CO2_PER_1000_GDP[country.stats.incomeGroup] ?? 0.3;
-  const totalEmissionsKt = (gdpTotal / 1000) * co2PerThousand;
-  const revenueUsd = dollarPerTon * totalEmissionsKt * 1000; // kt → tons
+  // co2PerThousand is tons of CO2 per $1,000 of GDP
+  // gdpTotal / 1000 = number of $1,000-of-GDP units → result is in tons
+  const totalEmissionsTons = (gdpTotal / 1000) * co2PerThousand;
+  const revenueUsd = dollarPerTon * totalEmissionsTons;
 
   return {
     mechanism: 'carbon_tax',
@@ -177,7 +237,7 @@ export function calcCarbonTax(
     coversPercentOfUbiCost: 0,
     assumptions: [
       `Carbon tax of $${dollarPerTon} per metric ton of CO2`,
-      `Estimated CO2 emissions: ${formatLargeNumber(totalEmissionsKt * 1000)} tons (${co2PerThousand} tons per $1,000 GDP for ${country.stats.incomeGroup})`,
+      `Estimated CO2 emissions: ${formatLargeNumber(totalEmissionsTons)} tons (${co2PerThousand} tons per $1,000 GDP for ${country.stats.incomeGroup})`,
       'Emission intensity is an income-group proxy, not country-specific',
     ],
   };
@@ -194,8 +254,9 @@ export function calcWealthTax(
 ): FundingEstimate {
   const gdpTotal = country.stats.gdpPerCapitaUsd * country.stats.population;
   const wealthRatio = WEALTH_TO_GDP_RATIO[country.stats.incomeGroup] ?? 2.0;
+  const collectionFactor = WEALTH_TAX_COLLECTION_FACTOR[country.stats.incomeGroup] ?? 0.30;
   const totalWealth = gdpTotal * wealthRatio;
-  const revenueUsd = rate * totalWealth;
+  const revenueUsd = rate * totalWealth * collectionFactor;
 
   return {
     mechanism: 'wealth_tax',
@@ -206,6 +267,7 @@ export function calcWealthTax(
     assumptions: [
       `Wealth tax of ${(rate * 100).toFixed(2)}% on total private wealth`,
       `Wealth-to-GDP ratio: ${wealthRatio}x (${country.stats.incomeGroup} income group proxy)`,
+      `Effective collection rate: ${(collectionFactor * 100).toFixed(0)}% (accounts for avoidance, offshore structures, capital flight)`,
       'Based on Credit Suisse Global Wealth Report averages; actual wealth concentration varies',
     ],
   };

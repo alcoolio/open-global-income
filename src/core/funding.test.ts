@@ -87,17 +87,17 @@ describe('calcIncomeTaxSurcharge', () => {
   it('calculates revenue from income tax surcharge', () => {
     const est = calcIncomeTaxSurcharge(kenya, 0.03);
     expect(est.mechanism).toBe('income_tax_surcharge');
-    // 0.03 × 2010 × 54030000 × 0.723 ≈ 2,354,XXX,XXX
-    expect(est.annualRevenuePppUsd).toBeGreaterThan(2_000_000_000);
-    expect(est.annualRevenuePppUsd).toBeLessThan(3_000_000_000);
+    // 0.03 × 2010 × 54030000 × 0.723 × 0.50 (LMC formality) ≈ 1,178,XXX,XXX
+    expect(est.annualRevenuePppUsd).toBeGreaterThan(1_000_000_000);
+    expect(est.annualRevenuePppUsd).toBeLessThan(2_000_000_000);
     expect(est.annualRevenueLocal).toBeGreaterThan(0);
-    expect(est.assumptions.length).toBeGreaterThan(0);
+    expect(est.assumptions.some((a) => a.includes('formal'))).toBe(true);
   });
 
   it('falls back to 60% LFP when data missing', () => {
     const est = calcIncomeTaxSurcharge(kenyaMinimal, 0.03);
-    // 0.03 × 2010 × 54030000 × 0.60
-    const expected = 0.03 * 2010 * 54030000 * 0.6;
+    // 0.03 × 2010 × 54030000 × 0.60 × 0.50 (LMC formality)
+    const expected = 0.03 * 2010 * 54030000 * 0.6 * 0.50;
     expect(est.annualRevenuePppUsd).toBe(Math.round(expected));
     expect(est.assumptions.some((a) => a.includes('estimated'))).toBe(true);
   });
@@ -107,6 +107,28 @@ describe('calcIncomeTaxSurcharge', () => {
     const est2 = calcIncomeTaxSurcharge(kenya, 0.02);
     expect(Math.round(est2.annualRevenuePppUsd / est1.annualRevenuePppUsd)).toBe(2);
   });
+
+  it('HIC countries collect more than LIC at same rate', () => {
+    const hic: Country = { ...germany };
+    const lic: Country = {
+      code: 'XX',
+      name: 'Test LIC',
+      stats: {
+        gdpPerCapitaUsd: 600,
+        gniPerCapitaUsd: 550,
+        pppConversionFactor: 300,
+        giniIndex: 40,
+        population: 10_000_000,
+        incomeGroup: 'LIC',
+        laborForceParticipation: 70,
+      },
+    };
+    const licEst = calcIncomeTaxSurcharge(lic, 0.05);
+    const hicEst = calcIncomeTaxSurcharge(hic, 0.05);
+    const licRatio = licEst.annualRevenuePppUsd / (lic.stats.gniPerCapitaUsd * lic.stats.population);
+    const hicRatio = hicEst.annualRevenuePppUsd / (hic.stats.gniPerCapitaUsd * hic.stats.population);
+    expect(hicRatio).toBeGreaterThan(licRatio);
+  });
 });
 
 describe('calcVatIncrease', () => {
@@ -115,6 +137,16 @@ describe('calcVatIncrease', () => {
     expect(est.mechanism).toBe('vat_increase');
     expect(est.annualRevenuePppUsd).toBeGreaterThan(0);
     expect(est.assumptions.some((a) => a.includes('4.8%'))).toBe(true);
+    expect(est.assumptions.some((a) => a.includes('Behavioral discount'))).toBe(true);
+  });
+
+  it('applies behavioral discount — revenue is below naive linear amount', () => {
+    const est = calcVatIncrease(kenya, 2);
+    const gdp = kenya.stats.gdpPerCapitaUsd * kenya.stats.population;
+    // Naive linear: (2/15) × 0.048 × gdp; with 20% discount should be 80% of that
+    const naiveLinear = (2 / 15) * (4.8 / 100) * gdp;
+    expect(est.annualRevenuePppUsd).toBeLessThan(naiveLinear);
+    expect(est.annualRevenuePppUsd).toBeCloseTo(naiveLinear * 0.80, -6);
   });
 
   it('falls back when no tax breakdown', () => {
@@ -139,26 +171,38 @@ describe('calcCarbonTax', () => {
     expect(est.assumptions.length).toBeGreaterThanOrEqual(2);
   });
 
+  it('produces plausible revenue well below GDP', () => {
+    const est = calcCarbonTax(kenya, 25);
+    const gdp = kenya.stats.gdpPerCapitaUsd * kenya.stats.population;
+    // $25/ton carbon tax should raise well under 5% of GDP
+    expect(est.annualRevenuePppUsd).toBeLessThan(gdp * 0.05);
+    // and more than a trivial amount (> $100M)
+    expect(est.annualRevenuePppUsd).toBeGreaterThan(100_000_000);
+  });
+
   it('higher rate = higher revenue', () => {
     const est25 = calcCarbonTax(kenya, 25);
     const est50 = calcCarbonTax(kenya, 50);
-    expect(est50.annualRevenuePppUsd).toBe(est25.annualRevenuePppUsd * 2);
+    // Allow ±1 for integer rounding of independently computed values
+    expect(est50.annualRevenuePppUsd).toBeCloseTo(est25.annualRevenuePppUsd * 2, -1);
   });
 });
 
 describe('calcWealthTax', () => {
-  it('calculates wealth tax revenue', () => {
+  it('calculates wealth tax revenue with collection adjustment', () => {
     const est = calcWealthTax(kenya, 0.01);
     expect(est.mechanism).toBe('wealth_tax');
     const gdp = kenya.stats.gdpPerCapitaUsd * kenya.stats.population;
-    const expected = 0.01 * gdp * 1.8; // LMC ratio
+    // LMC: wealth ratio 1.8x, collection factor 0.25
+    const expected = 0.01 * gdp * 1.8 * 0.25;
     expect(est.annualRevenuePppUsd).toBe(Math.round(expected));
+    expect(est.assumptions.some((a) => a.includes('collection rate'))).toBe(true);
   });
 
   it('uses different ratios for different income groups', () => {
     const estKe = calcWealthTax(kenya, 0.01);
     const estDe = calcWealthTax(germany, 0.01);
-    // Germany (HIC) has higher wealth-to-GDP ratio
+    // Germany (HIC, ratio 4.5x, collection 0.55) should yield more per GDP than Kenya (LMC, 1.8x, 0.25)
     const ratioKe = estKe.annualRevenuePppUsd / (kenya.stats.gdpPerCapitaUsd * kenya.stats.population);
     const ratioDe = estDe.annualRevenuePppUsd / (germany.stats.gdpPerCapitaUsd * germany.stats.population);
     expect(ratioDe).toBeGreaterThan(ratioKe);
