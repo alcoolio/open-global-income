@@ -87,17 +87,17 @@ describe('calcIncomeTaxSurcharge', () => {
   it('calculates revenue from income tax surcharge', () => {
     const est = calcIncomeTaxSurcharge(kenya, 0.03);
     expect(est.mechanism).toBe('income_tax_surcharge');
-    // 0.03 × 2010 × 54030000 × 0.723 ≈ 2,354,XXX,XXX
-    expect(est.annualRevenuePppUsd).toBeGreaterThan(2_000_000_000);
-    expect(est.annualRevenuePppUsd).toBeLessThan(3_000_000_000);
+    // 0.03 × 2010 × 54030000 × 0.723 × 0.50 (LMC formality) ≈ 1,178,XXX,XXX
+    expect(est.annualRevenuePppUsd).toBeGreaterThan(1_000_000_000);
+    expect(est.annualRevenuePppUsd).toBeLessThan(2_000_000_000);
     expect(est.annualRevenueLocal).toBeGreaterThan(0);
-    expect(est.assumptions.length).toBeGreaterThan(0);
+    expect(est.assumptions.some((a) => a.includes('formal'))).toBe(true);
   });
 
   it('falls back to 60% LFP when data missing', () => {
     const est = calcIncomeTaxSurcharge(kenyaMinimal, 0.03);
-    // 0.03 × 2010 × 54030000 × 0.60
-    const expected = 0.03 * 2010 * 54030000 * 0.6;
+    // 0.03 × 2010 × 54030000 × 0.60 × 0.50 (LMC formality)
+    const expected = 0.03 * 2010 * 54030000 * 0.6 * 0.50;
     expect(est.annualRevenuePppUsd).toBe(Math.round(expected));
     expect(est.assumptions.some((a) => a.includes('estimated'))).toBe(true);
   });
@@ -106,6 +106,28 @@ describe('calcIncomeTaxSurcharge', () => {
     const est1 = calcIncomeTaxSurcharge(kenya, 0.01);
     const est2 = calcIncomeTaxSurcharge(kenya, 0.02);
     expect(Math.round(est2.annualRevenuePppUsd / est1.annualRevenuePppUsd)).toBe(2);
+  });
+
+  it('HIC countries collect more than LIC at same rate', () => {
+    const hic: Country = { ...germany };
+    const lic: Country = {
+      code: 'XX',
+      name: 'Test LIC',
+      stats: {
+        gdpPerCapitaUsd: 600,
+        gniPerCapitaUsd: 550,
+        pppConversionFactor: 300,
+        giniIndex: 40,
+        population: 10_000_000,
+        incomeGroup: 'LIC',
+        laborForceParticipation: 70,
+      },
+    };
+    const licEst = calcIncomeTaxSurcharge(lic, 0.05);
+    const hicEst = calcIncomeTaxSurcharge(hic, 0.05);
+    const licRatio = licEst.annualRevenuePppUsd / (lic.stats.gniPerCapitaUsd * lic.stats.population);
+    const hicRatio = hicEst.annualRevenuePppUsd / (hic.stats.gniPerCapitaUsd * hic.stats.population);
+    expect(hicRatio).toBeGreaterThan(licRatio);
   });
 });
 

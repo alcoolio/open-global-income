@@ -7,6 +7,24 @@ import type {
   SimulationResult,
 } from './types.js';
 
+// ── Collection-effectiveness factors ──────────────────────────────────────
+
+/**
+ * Share of labor income that is effectively reachable by income tax,
+ * accounting for informal-economy size by income group.
+ *
+ * LIC/LMC economies have large informal sectors (smallholder agriculture,
+ * street trade, cash services) that sit outside the formal tax base.
+ * Sources: IMF Fiscal Monitor informality estimates; World Bank informality
+ * database.
+ */
+const INCOME_TAX_FORMALITY_FACTOR: Record<string, number> = {
+  HIC: 0.90, // ~10% informal
+  UMC: 0.70, // ~30% informal
+  LMC: 0.50, // ~50% informal
+  LIC: 0.35, // ~65% informal
+};
+
 // ── Proxy constants for mechanisms without direct data ─────────────────────
 
 /**
@@ -73,14 +91,16 @@ export function calcIncomeTaxSurcharge(
   rate: number,
 ): FundingEstimate {
   const lfp = (country.stats.laborForceParticipation ?? 60) / 100;
-  const revenueUsd = rate * country.stats.gniPerCapitaUsd * country.stats.population * lfp;
+  const formalityFactor = INCOME_TAX_FORMALITY_FACTOR[country.stats.incomeGroup] ?? 0.60;
+  const revenueUsd =
+    rate * country.stats.gniPerCapitaUsd * country.stats.population * lfp * formalityFactor;
   const revenuePpp = revenueUsd;
   const revenueLocal = revenuePpp * country.stats.pppConversionFactor;
 
   const assumptions = [
     `Income tax surcharge of ${(rate * 100).toFixed(1)}% applied to GNI per capita`,
     `Labor force participation: ${(lfp * 100).toFixed(1)}%${country.stats.laborForceParticipation == null ? ' (estimated, data unavailable)' : ''}`,
-    'Assumes uniform tax base across all employed individuals (simplified)',
+    `Formal-economy adjustment: ${(formalityFactor * 100).toFixed(0)}% of labor income is in the tax base (${country.stats.incomeGroup} informality estimate)`,
   ];
 
   return {
