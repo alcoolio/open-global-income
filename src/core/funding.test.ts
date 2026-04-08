@@ -179,18 +179,20 @@ describe('calcCarbonTax', () => {
 });
 
 describe('calcWealthTax', () => {
-  it('calculates wealth tax revenue', () => {
+  it('calculates wealth tax revenue with collection adjustment', () => {
     const est = calcWealthTax(kenya, 0.01);
     expect(est.mechanism).toBe('wealth_tax');
     const gdp = kenya.stats.gdpPerCapitaUsd * kenya.stats.population;
-    const expected = 0.01 * gdp * 1.8; // LMC ratio
+    // LMC: wealth ratio 1.8x, collection factor 0.25
+    const expected = 0.01 * gdp * 1.8 * 0.25;
     expect(est.annualRevenuePppUsd).toBe(Math.round(expected));
+    expect(est.assumptions.some((a) => a.includes('collection rate'))).toBe(true);
   });
 
   it('uses different ratios for different income groups', () => {
     const estKe = calcWealthTax(kenya, 0.01);
     const estDe = calcWealthTax(germany, 0.01);
-    // Germany (HIC) has higher wealth-to-GDP ratio
+    // Germany (HIC, ratio 4.5x, collection 0.55) should yield more per GDP than Kenya (LMC, 1.8x, 0.25)
     const ratioKe = estKe.annualRevenuePppUsd / (kenya.stats.gdpPerCapitaUsd * kenya.stats.population);
     const ratioDe = estDe.annualRevenuePppUsd / (germany.stats.gdpPerCapitaUsd * germany.stats.population);
     expect(ratioDe).toBeGreaterThan(ratioKe);

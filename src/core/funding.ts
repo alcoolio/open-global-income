@@ -39,6 +39,27 @@ const WEALTH_TO_GDP_RATIO: Record<string, number> = {
 };
 
 /**
+ * Effective collection rate for a wealth tax, accounting for avoidance,
+ * capital flight, and enforcement capacity.
+ *
+ * High-net-worth individuals use offshore structures, complex trusts, and
+ * asset reclassification to reduce taxable wealth. The few countries that
+ * have implemented wealth taxes (France, Sweden, Germany) observed actual
+ * revenues well below naive estimates; most eventually repealed the tax.
+ * Lower-income countries have weaker enforcement and greater capital
+ * mobility risk.
+ *
+ * Sources: IMF Working Paper WP/19/143 "Taxing Wealth"; OECD "The Role and
+ * Design of Net Wealth Taxes".
+ */
+const WEALTH_TAX_COLLECTION_FACTOR: Record<string, number> = {
+  HIC: 0.55, // strong institutions, but high capital mobility
+  UMC: 0.40,
+  LMC: 0.25,
+  LIC: 0.15, // limited enforcement, large informal wealth
+};
+
+/**
  * Approximate CO2 emissions per GDP (tons per $1000 GDP).
  * Source: World Bank, rough averages by income group.
  */
@@ -216,8 +237,9 @@ export function calcWealthTax(
 ): FundingEstimate {
   const gdpTotal = country.stats.gdpPerCapitaUsd * country.stats.population;
   const wealthRatio = WEALTH_TO_GDP_RATIO[country.stats.incomeGroup] ?? 2.0;
+  const collectionFactor = WEALTH_TAX_COLLECTION_FACTOR[country.stats.incomeGroup] ?? 0.30;
   const totalWealth = gdpTotal * wealthRatio;
-  const revenueUsd = rate * totalWealth;
+  const revenueUsd = rate * totalWealth * collectionFactor;
 
   return {
     mechanism: 'wealth_tax',
@@ -228,6 +250,7 @@ export function calcWealthTax(
     assumptions: [
       `Wealth tax of ${(rate * 100).toFixed(2)}% on total private wealth`,
       `Wealth-to-GDP ratio: ${wealthRatio}x (${country.stats.incomeGroup} income group proxy)`,
+      `Effective collection rate: ${(collectionFactor * 100).toFixed(0)}% (accounts for avoidance, offshore structures, capital flight)`,
       'Based on Credit Suisse Global Wealth Report averages; actual wealth concentration varies',
     ],
   };
