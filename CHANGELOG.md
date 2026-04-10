@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Centralised all `process.env` reads through `config.ts`** — `config.ts` was designed as the single source of truth for every environment variable, but seven files bypassed it and re-parsed env vars directly. All direct `process.env.*` reads in `src/index.ts`, `src/api/server.ts`, `src/api/routes/income.ts`, `src/api/middleware/audit-log.ts`, `src/api/middleware/api-key-auth.ts`, `src/db/database.ts`, and `src/db/pg-adapter.ts` are replaced with the corresponding `config.*` field. `DB_BACKEND` validation (previously inside `getDbBackend()`) is now an IIFE in `config.ts`, so an invalid value throws at startup rather than only when the database is first opened.
+
 ### Fixed
 
 - **SQLite directory creation race condition** — `getDb()` created the data directory via a dynamic `import('node:fs').then(...)`, scheduling the `mkdirSync` call as a microtask. Because `new Database(path)` ran synchronously on the very next line, the directory did not exist yet, causing `SQLITE_CANTOPEN: unable to open database file` on every cold-start inside Docker (where `/app/data/` is not pre-created). Fixed by replacing the dynamic import with a static `import { mkdirSync } from 'node:fs'` and calling it synchronously before opening the database.
