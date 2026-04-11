@@ -4,6 +4,49 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.10] - 2026-04-11
+
+### Changed
+
+- **Centralised all `process.env` reads through `config.ts`** — `config.ts` was designed as the single source of truth for every environment variable, but seven files bypassed it and re-parsed env vars directly. All direct `process.env.*` reads in `src/index.ts`, `src/api/server.ts`, `src/api/routes/income.ts`, `src/api/middleware/audit-log.ts`, `src/api/middleware/api-key-auth.ts`, `src/db/database.ts`, and `src/db/pg-adapter.ts` are replaced with the corresponding `config.*` field. `DB_BACKEND` validation (previously inside `getDbBackend()`) is now an IIFE in `config.ts`, so an invalid value throws at startup rather than only when the database is first opened.
+
+### Fixed
+
+- **SQLite directory creation race condition** — `getDb()` created the data directory via a dynamic `import('node:fs').then(...)`, scheduling the `mkdirSync` call as a microtask. Because `new Database(path)` ran synchronously on the very next line, the directory did not exist yet, causing `SQLITE_CANTOPEN: unable to open database file` on every cold-start inside Docker (where `/app/data/` is not pre-created). Fixed by replacing the dynamic import with a static `import { mkdirSync } from 'node:fs'` and calling it synchronously before opening the database.
+
+### Added
+
+- **Docker Compose production configuration** — `docker-compose.yml` now includes:
+  - Named volume mount `./data:/app/data` so the SQLite database survives container restarts
+  - Node.js-based health check against `/health` (no extra `curl` dependency needed)
+  - `restart: unless-stopped` so the container recovers from crashes automatically
+  - CPU/memory resource limits (1 CPU / 512 MB) with soft reservations
+  - Structured JSON log rotation (`max-size: 10 m`, `max-file: 3`)
+  - Explicit `DB_PATH` env var pointing inside the mounted volume
+  - `ADMIN_USERNAME` / `ADMIN_PASSWORD` required via the `${VAR:?message}` syntax — the compose file will refuse to start if these are unset, preventing accidental deployment with the default `admin`/`admin` credentials
+- **`.dockerignore`** — excludes `node_modules`, `dist`, `data`, `.git`, `.env*`, SQLite WAL files, and test coverage from the build context, speeding up `docker build` and preventing accidental inclusion of secrets or local database files
+- **`.env.example`** — documents every environment variable accepted by the application with defaults and inline comments; copy to `.env` before running with `docker compose`
+
+## [0.1.9] - 2026-04-08
+
+### Fixed
+
+- **Carbon tax 1000x unit error** — `calcCarbonTax` named its intermediate variable `totalEmissionsKt` (kilotons) but computed it in tons, then applied an erroneous `* 1000` "kt → tons" conversion. Result: a $25/ton tax on Kenya produced **$992 billion** instead of the correct **$992 million** — enough to "fund" the entire UBI programme 36× over. Fixed by renaming to `totalEmissionsTons` and dropping the spurious multiply.
+- **Income tax surcharge ignores informal economy** — the surcharge formula applied the rate to the full GNI of the entire labour force, overstating collectable revenue by 2–3× in low-income countries where 50–65% of labour income sits in the informal sector and is outside the tax net. Introduced `INCOME_TAX_FORMALITY_FACTOR` (0.35–0.90 by income group, sourced from IMF/World Bank informality estimates) to discount the taxable base accordingly.
+- **Wealth tax assumes 100% collection** — real-world wealth taxes face significant avoidance via offshore structures, complex trusts, and capital flight; most countries that implemented them eventually repealed them. Introduced `WEALTH_TAX_COLLECTION_FACTOR` (0.15–0.55 by income group, sourced from IMF WP/19/143 and OECD design guidance) to bring estimates in line with observed outcomes.
+- **VAT increase uses naive linear elasticity** — each percentage-point VAT rise was assumed to raise revenue proportional to the existing VAT base, ignoring the demand response (reduced consumption, shift to informal markets). Applied a `VAT_BEHAVIORAL_DISCOUNT` of 0.80 (20% yield reduction) across all three VAT code paths, consistent with IMF and Keen & Lockwood (2010) cross-country estimates.
+
+### Changed
+
+- All four funding assumptions are now surfaced in the `assumptions` array of each `FundingEstimate` so users can see exactly what was modelled.
+- Test count: **396 tests** across **23 suites** (9 new tests added to `src/core/funding.test.ts` covering realistic revenue bounds, formality/avoidance factors, and behavioral discounts).
+
+## [0.1.8] - 2026-04-08
+
+### Fixed
+
+- **Macro-economic data population** — all 49 countries now have 17 macro-economic fields explicitly populated (previously all were `undefined`, causing data-completeness loops). Fields include 12 World Bank indicators (tax revenue, social spending, inflation, labor force, unemployment, debt, poverty, GDP growth, health/education expenditure, urbanization), 4 ILO fields (social protection coverage/expenditure, pension coverage, child benefits), and 1 IMF placeholder (tax breakdown). All fields are now explicitly `null` or numeric — never `undefined`.
+
 ## [0.1.7] - 2026-03-21
 
 ### Added

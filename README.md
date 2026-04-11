@@ -51,25 +51,25 @@ Open Global Income is a stack. Each layer builds on the one below it. The lower 
 └─────────────────────────────────────────────────┘
 ```
 
-### ✅ Built (v0.1.7)
+### ✅ Built (v0.1.10)
 
 **The API is the product.** Everything below is exposed through a REST API with OpenAPI docs, a generated TypeScript SDK, and webhook events — not locked behind a UI.
 
 | Layer | What it does | Phase |
 |-------|-------------|-------|
-| **Data** | 49 countries with 17+ macro-economic indicators from World Bank, ILO, and IMF; sub-national data for Kenya (47 counties) | 14, 17 |
+| **Data** | 49 countries with all 17 macro-economic indicators fully populated (World Bank, ILO, IMF); sub-national data for Kenya (47 counties) | 14, 17 |
 | **Calculation** | Entitlement formulas (v1 active, v2 preview), scoring, country comparison, regional COL adjustments | 1–10, 17 |
 | **Simulation** | Budget modeling with targeting presets, multi-country comparison, regional simulation, saved scenarios | 11, 17 |
 | **Disbursement** | Non-custodial payment rails — Solana USDC, EVM USDC, M-Pesa (stub) — with approval workflow and audit trail | 12 |
 | **Pilots** | Lifecycle management (planning → active → completed), variance analysis, structured donor reports | 13 |
-| **Funding** | 6 funding mechanisms (income tax, VAT, carbon tax, wealth tax, FTT, redirect social spending), fiscal context analysis | 15 |
+| **Funding** | 6 funding mechanisms (income tax, VAT, carbon tax, wealth tax, FTT, redirect social spending) with informality, avoidance, and demand-response adjustments; fiscal context analysis | 15 |
 | **Impact** | Poverty reduction, purchasing power, social coverage, GDP stimulus estimates — with exportable policy briefs | 16 |
 
 The funding and impact layers (Phases 14–16) are not a departure from the API — they are the **demand-side tools** that make the API worth building. A calculation engine answers "how much per person?" but nobody funds a program based on that alone. Governments need to see where the money comes from. Donors need to see what happens to poverty. NGOs need a policy brief they can attach to a grant proposal. These layers turn the API into a tool that **sells basic income to policymakers**.
 
 The sub-national data layer (Phase 17) brings precision where it matters most. A basic income floor in Nairobi (COL 1.35×) should not be the same local-currency amount as in rural Turkana (COL 0.68×). Regional cost-of-living indices adjust the national PPP conversion factor, and existing formulas work transparently via the "adjusted Country" pattern — zero formula changes needed.
 
-Secure admin UI with login, approval workflows, and audit trails. **387 tests** across 23 suites.
+Secure admin UI with login, approval workflows, and audit trails. **396 tests** across 23 suites.
 
 ### 🔜 Next
 
@@ -135,10 +135,13 @@ curl http://localhost:3333/v1/income/calc?country=KE
 ```bash
 git clone https://github.com/alcoolio/open-global-income.git
 cd open-global-income
+cp .env.example .env          # fill in ADMIN_USERNAME and ADMIN_PASSWORD
 docker compose up --build
 ```
 
-This builds the image and starts the API on port `3333`. No other dependencies required — the Dockerfile uses a multi-stage build with `node:20-slim`.
+The compose file uses `ADMIN_USERNAME` and `ADMIN_PASSWORD` from the environment (or a `.env` file). Both are **required** — compose will refuse to start if either is unset to prevent accidental deployment with default credentials.
+
+The SQLite database is persisted in `./data/ogi.sqlite` on the host via a volume mount, so data survives container restarts.
 
 Once the container is running, the following URLs are available:
 
@@ -148,38 +151,30 @@ Once the container is running, the following URLs are available:
 | `http://localhost:3333/docs` | Swagger UI — interactive API documentation |
 | `http://localhost:3333/docs/json` | Raw OpenAPI spec (JSON) |
 | `http://localhost:3333/v1/income/calc?country=KE` | Example: calculate Kenya's entitlement |
-| `http://localhost:3333/admin` | Admin UI (requires `ENABLE_ADMIN=true`) |
+| `http://localhost:3333/admin` | Admin UI |
 | `http://localhost:3333/metrics` | Prometheus metrics |
 
-#### Docker with environment variables
+#### Environment variables
 
-Pass environment variables to configure the container:
+All available environment variables are documented in `.env.example`. The most important ones for production:
 
-```bash
-docker compose up --build -e ENABLE_ADMIN=true -e ADMIN_PASSWORD=changeme
-```
-
-Or edit `docker-compose.yml` to add them:
-
-```yaml
-services:
-  api:
-    build: .
-    ports:
-      - "3333:3333"
-    environment:
-      - NODE_ENV=production
-      - PORT=3333
-      - ENABLE_ADMIN=true
-      - ADMIN_PASSWORD=changeme
-      - API_KEY_REQUIRED=false
-```
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `ADMIN_USERNAME` | — | **Required.** No default; compose refuses to start without it |
+| `ADMIN_PASSWORD` | — | **Required.** No default; compose refuses to start without it |
+| `DB_PATH` | `./data/ogi.sqlite` | Set to `/app/data/ogi.sqlite` inside Docker |
+| `API_KEY_REQUIRED` | `false` | Set to `true` to enforce API keys on all endpoints |
+| `CORS_ORIGIN` | `*` | Restrict to your frontend origin in production |
 
 #### Docker build only
 
 ```bash
 docker build -t open-global-income .
-docker run -p 3333:3333 open-global-income
+docker run -p 3333:3333 \
+  -v "$(pwd)/data:/app/data" \
+  -e ADMIN_USERNAME=admin \
+  -e ADMIN_PASSWORD=changeme \
+  open-global-income
 ```
 
 ### Useful commands
@@ -461,7 +456,7 @@ See [GOVERNANCE.md](./GOVERNANCE.md) for the decision-making process, API stabil
 
 ## 📋 Current Status
 
-**Version 0.1.7** — Seven phases complete (simulation, disbursement, pilots, macro-economic data, funding, impact, sub-national data). 387 tests across 23 suites. The platform now covers the full workflow from "how much per person?" through "where does the money come from?" to "what happens to poverty?" — with regional precision that reflects actual cost-of-living differences within countries.
+**Version 0.1.10** — Seven phases complete (simulation, disbursement, pilots, macro-economic data, funding, impact, sub-national data). 396 tests across 23 suites. The platform now covers the full workflow from "how much per person?" through "where does the money come from?" to "what happens to poverty?" — with regional precision that reflects actual cost-of-living differences within countries. Docker deployment is production-ready with data persistence, health checks, and enforced credentials.
 
 See [CHANGELOG.md](./CHANGELOG.md) for full version history.
 
