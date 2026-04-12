@@ -346,10 +346,11 @@ Closes #42
 
 Every commit that changes behaviour (bug fixes, new features, formula changes) **must** also update:
 
-1. **`CHANGELOG.md`** — add an entry under the current version (or a new `[Unreleased]` block if the version hasn't been bumped yet). Follow Keep a Changelog conventions: `### Fixed`, `### Added`, `### Changed`, `### Removed`.
-2. **`README.md`** — update any sections that reference changed behaviour: test counts, capability tables, funding mechanism descriptions, API endpoint lists, etc.
+1. **`package.json`** — bump the patch version (`0.1.x → 0.1.x+1`). Use minor bumps (`0.x.0`) for new capability layers; patch bumps for fixes, additions within an existing layer, and data updates.
+2. **`CHANGELOG.md`** — promote the `[Unreleased]` block to a versioned entry matching the new `package.json` version (e.g. `## [0.1.11] - 2026-04-12`), then add a fresh empty `## [Unreleased]` header above it. Follow Keep a Changelog conventions: `### Fixed`, `### Added`, `### Changed`, `### Removed`.
+3. **`README.md`** — update any sections that reference changed behaviour: test counts, capability tables, funding mechanism descriptions, API endpoint lists, etc.
 
-Documentation-only commits (fixing typos, rewording) do not require a CHANGELOG entry, but README must still be consistent.
+Documentation-only commits (fixing typos, rewording) do not require a version bump or CHANGELOG entry, but README must still be consistent.
 
 ### Model Usage Policy
 
