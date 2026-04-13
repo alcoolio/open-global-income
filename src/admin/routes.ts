@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { FastifyPluginAsync } from 'fastify';
 import { renderLogin } from './views/login.js';
 import { renderDashboard, type DashboardData } from './views/dashboard.js';
@@ -18,7 +19,10 @@ import { getDb } from '../db/database.js';
 import { calculateSimulation } from '../core/simulations.js';
 import { listSimulations, saveSimulation, deleteSimulation, getSimulationById } from '../db/simulations-db.js';
 import { createPilot, getPilotById, listPilots, updatePilot, linkDisbursement, getPilotDisbursementIds } from '../db/pilots-db.js';
-import { getDisbursementById } from '../db/disbursements-db.js';
+import { getDisbursementById, getLogEntries } from '../db/disbursements-db.js';
+import { listRecipients } from '../db/recipients-db.js';
+import { RULESETS } from '../core/rulesets.js';
+import { GLOBAL_INCOME_FLOOR_PPP } from '../core/constants.js';
 import { calculateFundingScenario } from '../core/funding.js';
 import { listFundingScenarios, saveFundingScenario, deleteFundingScenario } from '../db/funding-db.js';
 import { calculateImpactAnalysis } from '../core/impact.js';
@@ -91,6 +95,27 @@ function getAuthenticatedUserId(request: { headers: Record<string, string | stri
   if (!token) return null;
   const session = findSession(token);
   return session ? session.userId : null;
+}
+
+// ---------------------------------------------------------------------------
+// Audit export helpers
+// ---------------------------------------------------------------------------
+
+function canonicalJson(obj: unknown): string {
+  if (Array.isArray(obj)) {
+    return '[' + obj.map(canonicalJson).join(',') + ']';
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const keys = Object.keys(obj as Record<string, unknown>).sort();
+    return (
+      '{' +
+      keys
+        .map((k) => JSON.stringify(k) + ':' + canonicalJson((obj as Record<string, unknown>)[k]))
+        .join(',') +
+      '}'
+    );
+  }
+  return JSON.stringify(obj);
 }
 
 // ---------------------------------------------------------------------------
@@ -423,6 +448,87 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
       return reply.redirect(`/admin/pilots/${pilot.id}?flash=Disbursement+linked`);
     },
   );
+
+  // ── GET /admin/pilots/:id/audit-export ────────────────────────────────────
+
+  app.get<{ Params: { id: string } }>('/pilots/:id/audit-export', async (request, reply) => {
+    const pilot = getPilotById(request.params.id);
+    if (!pilot) {
+      return reply.redirect('/admin/pilots?flash=Pilot+not+found');
+    }
+
+    const disbursementIds = getPilotDisbursementIds(pilot.id);
+    const disbursements = disbursementIds
+      .map((did) => getDisbursementById(did))
+      .filter((d) => d !== null);
+
+    const { items: pilotRecipients } = listRecipients({ pilotId: pilot.id, page: 1, limit: 10000 });
+    const byCountry: Record<string, number> = {};
+    for (const r of pilotRecipients) {
+      byCountry[r.countryCode] = (byCountry[r.countryCode] ?? 0) + 1;
+    }
+
+    const activeRuleset = RULESETS.find((r) => r.active) ?? RULESETS[0];
+    const dataVersion = getDataVersion();
+
+    const disbursementsAudit = disbursements.map((d) => ({
+      id: d.id,
+      status: d.status,
+      recipientCount: d.recipientCount,
+      totalAmount: d.totalAmount,
+      currency: d.currency,
+      approvedAt: d.approvedAt ?? null,
+      completedAt: d.completedAt ?? null,
+      log: getLogEntries(d.id),
+    }));
+
+    const generatedAt = new Date().toISOString();
+
+    const payload = {
+      exportVersion: '1.0',
+      generatedAt,
+      pilot: {
+        id: pilot.id,
+        name: pilot.name,
+        countryCode: pilot.countryCode,
+        status: pilot.status,
+        startDate: pilot.startDate ?? null,
+        endDate: pilot.endDate ?? null,
+        targetRecipients: pilot.targetRecipients ?? null,
+        description: pilot.description ?? null,
+        createdAt: pilot.createdAt,
+      },
+      methodology: {
+        rulesetVersion: activeRuleset.version,
+        dataVersion,
+        formulaDescription: activeRuleset.description,
+        entitlementPerRecipient: { pppUsd: GLOBAL_INCOME_FLOOR_PPP },
+      },
+      recipients: {
+        totalEnrolled: pilotRecipients.length,
+        totalVerified: pilotRecipients.filter((r) => r.status === 'verified').length,
+        totalSuspended: pilotRecipients.filter((r) => r.status === 'suspended').length,
+        byCountry,
+      },
+      disbursements: disbursementsAudit,
+    };
+
+    const sha256 = createHash('sha256').update(canonicalJson(payload)).digest('hex');
+
+    const exportDoc = {
+      ...payload,
+      integrity: {
+        sha256,
+        signedBy: 'ogi-platform',
+        algorithm: 'SHA-256',
+      },
+    };
+
+    return reply
+      .header('Content-Disposition', `attachment; filename="audit-export-${pilot.id}.json"`)
+      .type('application/json')
+      .send(JSON.stringify(exportDoc, null, 2));
+  });
 
   // ── Funding Scenario Builder ───────────────────────────────────────────────
 

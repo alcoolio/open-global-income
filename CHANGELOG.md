@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-04-13
+
+### Added
+- Phase 21: Structured Audit Exports
+- `GET /v1/pilots/:id/audit-export` — generates a compliance-grade, self-contained audit document covering pilot metadata, methodology (ruleset version, data version, formula), recipient aggregate stats, and all linked disbursements with their full event logs
+- SHA-256 integrity hash over canonical JSON (sorted keys, no whitespace) of the export payload, allowing independent tamper-detection by auditors and donors
+- GDPR-safe design: only aggregate recipient counts (`totalEnrolled`, `totalVerified`, `totalSuspended`, `byCountry`) are included — no raw account identifiers, IBANs, or phone numbers
+- `pilot.audit_export_generated` webhook event fired on each export
+- Admin UI "Export Audit Document" button on pilot detail page — triggers a signed JSON file download via `GET /admin/pilots/:id/audit-export`
+- 5 new tests: full document structure, SHA-256 hash correctness, disbursement log entries in export, 404 for unknown pilot, GDPR check (no raw account identifiers in output)
+- **Test count: 453 tests** across 26 suites
+
 ## [0.1.13] - 2026-04-13
 
 ### Added

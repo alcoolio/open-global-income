@@ -774,11 +774,11 @@ Phase 17 (Sub-national Data) ✅ ← Kenya 47 counties
     ↓
 Phase 18 (EU Disbursement & Regions) ✅ ← SEPA stub + DE/FR/NL regions
     ↓
-Phase 19 (Recipient & Identity Model) ← operational foundation
+Phase 19 (Recipient & Identity Model) ✅ ← operational foundation
     ↓ recipient_id links to disbursements
-Phase 20 (Inbound Webhooks) ← provider callbacks update disbursement state
+Phase 20 (Inbound Webhooks) ✅ ← provider callbacks update disbursement state
     ↓
-Phase 21 (Audit Exports) ← compliance-grade signed document per pilot
+Phase 21 (Audit Exports) ✅ ← compliance-grade signed document per pilot
     ↓
 Phase 22 (Programmable Targeting) ← recipient-aware custom targeting rules
     ↓
@@ -963,7 +963,7 @@ Wise sends a `POST` to a configured URL when a transfer changes state. The `sepa
 
 ---
 
-## Phase 21: Structured Audit Exports
+## Phase 21: Structured Audit Exports — Complete ✅
 
 **Goal:** Generate a compliance-grade, self-contained document for every pilot that regulators, donors, and auditors can independently verify. Answer: *"Can we prove, to a court standard, what happened, to whom, and why?"*
 

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { FastifyPluginAsync } from 'fastify';
 import {
   createPilot,
@@ -7,11 +8,33 @@ import {
   linkDisbursement,
   getPilotDisbursementIds,
 } from '../../db/pilots-db.js';
-import { getDisbursementById } from '../../db/disbursements-db.js';
+import { getDisbursementById, getLogEntries } from '../../db/disbursements-db.js';
+import { listRecipients } from '../../db/recipients-db.js';
 import { getSimulationById } from '../../db/simulations-db.js';
 import { dispatchEvent } from '../../webhooks/dispatcher.js';
 import { parsePagination, buildPaginationMeta } from '../pagination.js';
+import { RULESETS } from '../../core/rulesets.js';
+import { GLOBAL_INCOME_FLOOR_PPP } from '../../core/constants.js';
+import { getDataVersion } from '../../data/loader.js';
 import type { PilotStatus } from '../../core/types.js';
+
+/** Produce deterministic canonical JSON (sorted keys, no whitespace) for hashing. */
+function canonicalJson(obj: unknown): string {
+  if (Array.isArray(obj)) {
+    return '[' + obj.map(canonicalJson).join(',') + ']';
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const keys = Object.keys(obj as Record<string, unknown>).sort();
+    return (
+      '{' +
+      keys
+        .map((k) => JSON.stringify(k) + ':' + canonicalJson((obj as Record<string, unknown>)[k]))
+        .join(',') +
+      '}'
+    );
+  }
+  return JSON.stringify(obj);
+}
 
 const VALID_STATUSES = ['planning', 'active', 'paused', 'completed'];
 
@@ -327,5 +350,93 @@ export const pilotsRoute: FastifyPluginAsync = async (app) => {
     });
 
     return reply.send({ ok: true, data: report });
+  });
+
+  // ── GET /v1/pilots/:id/audit-export ──────────────────────────────────────────
+
+  app.get<{ Params: { id: string } }>('/pilots/:id/audit-export', async (request, reply) => {
+    const pilot = getPilotById(request.params.id);
+    if (!pilot) {
+      return reply.status(404).send({
+        ok: false,
+        error: { code: 'NOT_FOUND', message: 'Pilot not found' },
+      });
+    }
+
+    const disbursementIds = getPilotDisbursementIds(pilot.id);
+    const disbursements = disbursementIds
+      .map((did) => getDisbursementById(did))
+      .filter((d) => d !== null);
+
+    // Aggregate recipient stats — only counts, no PII
+    const { items: pilotRecipients } = listRecipients({ pilotId: pilot.id, page: 1, limit: 10000 });
+    const byCountry: Record<string, number> = {};
+    for (const r of pilotRecipients) {
+      byCountry[r.countryCode] = (byCountry[r.countryCode] ?? 0) + 1;
+    }
+
+    const activeRuleset = RULESETS.find((r) => r.active) ?? RULESETS[0];
+    const dataVersion = getDataVersion();
+
+    // Build disbursement audit entries with full log — no account identifiers
+    const disbursementsAudit = disbursements.map((d) => ({
+      id: d.id,
+      status: d.status,
+      recipientCount: d.recipientCount,
+      totalAmount: d.totalAmount,
+      currency: d.currency,
+      approvedAt: d.approvedAt ?? null,
+      completedAt: d.completedAt ?? null,
+      log: getLogEntries(d.id),
+    }));
+
+    const generatedAt = new Date().toISOString();
+
+    const payload = {
+      exportVersion: '1.0',
+      generatedAt,
+      pilot: {
+        id: pilot.id,
+        name: pilot.name,
+        countryCode: pilot.countryCode,
+        status: pilot.status,
+        startDate: pilot.startDate ?? null,
+        endDate: pilot.endDate ?? null,
+        targetRecipients: pilot.targetRecipients ?? null,
+        description: pilot.description ?? null,
+        createdAt: pilot.createdAt,
+      },
+      methodology: {
+        rulesetVersion: activeRuleset.version,
+        dataVersion,
+        formulaDescription: activeRuleset.description,
+        entitlementPerRecipient: { pppUsd: GLOBAL_INCOME_FLOOR_PPP },
+      },
+      recipients: {
+        totalEnrolled: pilotRecipients.length,
+        totalVerified: pilotRecipients.filter((r) => r.status === 'verified').length,
+        totalSuspended: pilotRecipients.filter((r) => r.status === 'suspended').length,
+        byCountry,
+      },
+      disbursements: disbursementsAudit,
+    };
+
+    const sha256 = createHash('sha256').update(canonicalJson(payload)).digest('hex');
+
+    const exportDoc = {
+      ...payload,
+      integrity: {
+        sha256,
+        signedBy: 'ogi-platform',
+        algorithm: 'SHA-256',
+      },
+    };
+
+    void dispatchEvent('pilot.audit_export_generated', {
+      pilotId: pilot.id,
+      generatedAt,
+    });
+
+    return reply.send({ ok: true, data: exportDoc });
   });
 };
