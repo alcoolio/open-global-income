@@ -51,7 +51,7 @@ Open Global Income is a stack. Each layer builds on the one below it. The lower 
 └─────────────────────────────────────────────────┘
 ```
 
-### ✅ Built (v0.1.12)
+### ✅ Built (v0.1.14)
 
 **The API is the product.** Everything below is exposed through a REST API with OpenAPI docs, a generated TypeScript SDK, and webhook events — not locked behind a UI.
 
@@ -63,6 +63,7 @@ Open Global Income is a stack. Each layer builds on the one below it. The lower 
 | **Disbursement** | Non-custodial payment rails — Solana USDC, EVM USDC, M-Pesa (stub), SEPA Credit Transfer (stub) — with approval workflow and audit trail | 12 |
 | **Recipients** | Enrollment, identity verification interface, cross-program duplicate detection — no raw identity data stored | 19 |
 | **Pilots** | Lifecycle management (planning → active → completed), variance analysis, structured donor reports | 13 |
+| **Audit Exports** | Compliance-grade signed export per pilot — methodology, recipient aggregate stats, full disbursement log, SHA-256 integrity hash | 21 |
 | **Funding** | 6 funding mechanisms (income tax, VAT, carbon tax, wealth tax, FTT, redirect social spending) with informality, avoidance, and demand-response adjustments; fiscal context analysis | 15 |
 | **Impact** | Poverty reduction, purchasing power, social coverage, GDP stimulus estimates — with exportable policy briefs | 16 |
 
@@ -70,7 +71,7 @@ The funding and impact layers (Phases 14–16) are not a departure from the API 
 
 The sub-national data layer (Phase 17) brings precision where it matters most. A basic income floor in Nairobi (COL 1.35×) should not be the same local-currency amount as in rural Turkana (COL 0.68×). Regional cost-of-living indices adjust the national PPP conversion factor, and existing formulas work transparently via the "adjusted Country" pattern — zero formula changes needed.
 
-Secure admin UI with login, approval workflows, and audit trails. **448 tests** across 26 suites.
+Secure admin UI with login, approval workflows, and audit trails. **453 tests** across 26 suites.
 
 ### 🔜 Next
 

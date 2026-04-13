@@ -536,3 +536,146 @@ describe('Pilot lifecycle (planning → active → paused → active → complet
     expect(res.statusCode).toBe(409);
   });
 });
+
+// ── GET /v1/pilots/:id/audit-export ──────────────────────────────────────────
+
+describe('GET /v1/pilots/:id/audit-export', () => {
+  it('returns full audit export document with all required fields', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/v1/pilots',
+      payload: { name: 'Audit Export Test', countryCode: 'KE', targetRecipients: 500 },
+    });
+    const pilotId = createRes.json().data.id;
+
+    const res = await app.inject({ method: 'GET', url: `/v1/pilots/${pilotId}/audit-export` });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.ok).toBe(true);
+
+    const doc = body.data;
+    expect(doc.exportVersion).toBe('1.0');
+    expect(doc.generatedAt).toBeDefined();
+    expect(doc.pilot.id).toBe(pilotId);
+    expect(doc.pilot.name).toBe('Audit Export Test');
+    expect(doc.pilot.countryCode).toBe('KE');
+    expect(doc.methodology.rulesetVersion).toBeDefined();
+    expect(doc.methodology.entitlementPerRecipient.pppUsd).toBe(210);
+    expect(doc.recipients.totalEnrolled).toBeDefined();
+    expect(Array.isArray(doc.disbursements)).toBe(true);
+    expect(doc.integrity.sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(doc.integrity.signedBy).toBe('ogi-platform');
+    expect(doc.integrity.algorithm).toBe('SHA-256');
+  });
+
+  it('integrity hash is stable for the same pilot state', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/v1/pilots',
+      payload: { name: 'Hash Stability Test', countryCode: 'KE' },
+    });
+    const pilotId = createRes.json().data.id;
+
+    const res1 = await app.inject({ method: 'GET', url: `/v1/pilots/${pilotId}/audit-export` });
+    const res2 = await app.inject({ method: 'GET', url: `/v1/pilots/${pilotId}/audit-export` });
+
+    // Hashes must match even though generatedAt differs — same underlying data
+    // Note: generatedAt is part of the payload, so timestamps may differ.
+    // We verify the hash algorithm is deterministic given the same payload.
+    const doc1 = res1.json().data;
+    const doc2 = res2.json().data;
+
+    // Both responses must be well-formed with 64-char hex SHA-256
+    expect(doc1.integrity.sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(doc2.integrity.sha256).toMatch(/^[0-9a-f]{64}$/);
+
+    // If generatedAt is the same (same second), hashes must match exactly
+    if (doc1.generatedAt === doc2.generatedAt) {
+      expect(doc1.integrity.sha256).toBe(doc2.integrity.sha256);
+    }
+
+    // Hash must be a SHA-256 of the payload without the integrity field
+    const { integrity: _i1, ...payload1 } = doc1;
+    const { integrity: _i2, ...payload2 } = doc2;
+    void _i1; void _i2;
+
+    function canonicalJson(obj: unknown): string {
+      if (Array.isArray(obj)) return '[' + (obj as unknown[]).map(canonicalJson).join(',') + ']';
+      if (obj !== null && typeof obj === 'object') {
+        const keys = Object.keys(obj as Record<string, unknown>).sort();
+        return '{' + keys.map((k) => JSON.stringify(k) + ':' + canonicalJson((obj as Record<string, unknown>)[k])).join(',') + '}';
+      }
+      return JSON.stringify(obj);
+    }
+
+    const { createHash } = await import('node:crypto');
+    expect(doc1.integrity.sha256).toBe(createHash('sha256').update(canonicalJson(payload1)).digest('hex'));
+    expect(doc2.integrity.sha256).toBe(createHash('sha256').update(canonicalJson(payload2)).digest('hex'));
+  });
+
+  it('disbursement log entries appear in the export', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/v1/pilots',
+      payload: { name: 'Log Entries Test', countryCode: 'KE' },
+    });
+    const pilotId = createRes.json().data.id;
+    const disbursementId = await createTestDisbursement();
+
+    await app.inject({
+      method: 'POST',
+      url: `/v1/pilots/${pilotId}/disbursements`,
+      payload: { disbursementId },
+    });
+
+    const res = await app.inject({ method: 'GET', url: `/v1/pilots/${pilotId}/audit-export` });
+    expect(res.statusCode).toBe(200);
+    const doc = res.json().data;
+    expect(doc.disbursements.length).toBe(1);
+    expect(doc.disbursements[0].id).toBe(disbursementId);
+    // A 'created' log entry is always added when a disbursement is created
+    expect(Array.isArray(doc.disbursements[0].log)).toBe(true);
+    expect(doc.disbursements[0].log.length).toBeGreaterThan(0);
+    expect(doc.disbursements[0].log[0].event).toBe('created');
+  });
+
+  it('returns 404 for unknown pilot', async () => {
+    const res = await app.inject({ method: 'GET', url: '/v1/pilots/nonexistent/audit-export' });
+    expect(res.statusCode).toBe(404);
+    expect(res.json().error.code).toBe('NOT_FOUND');
+  });
+
+  it('GDPR: export contains no raw account identifiers', async () => {
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/v1/pilots',
+      payload: { name: 'GDPR Test Pilot', countryCode: 'DE' },
+    });
+    const pilotId = createRes.json().data.id;
+
+    // Enroll a recipient using a hash (never a raw IBAN)
+    await app.inject({
+      method: 'POST',
+      url: '/v1/recipients',
+      payload: {
+        countryCode: 'DE',
+        accountHash: 'abc123hashvalue',
+        routingRef: 'DE89***0000',
+        paymentMethod: 'sepa',
+        pilotId,
+      },
+    });
+
+    const res = await app.inject({ method: 'GET', url: `/v1/pilots/${pilotId}/audit-export` });
+    expect(res.statusCode).toBe(200);
+    const raw = res.body;
+
+    // Only aggregate counts appear — not individual account hashes or routing refs
+    const doc = res.json().data;
+    expect(doc.recipients.totalEnrolled).toBe(1);
+
+    // The raw account hash and routing ref must NOT appear verbatim in the export body
+    expect(raw).not.toContain('abc123hashvalue');
+    expect(raw).not.toContain('DE89***0000');
+  });
+});
