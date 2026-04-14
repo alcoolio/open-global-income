@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-04-14
+
+### Added
+- Phase 22: Programmable Targeting Rules
+- `TargetingRules` interface in `src/core/types.ts` — structured rules object with `preset`, `ageRange`, `urbanRural`, `maxMonthlyIncomePppUsd`, `identityProviders`, `excludeIfPaidWithinDays`, and `regionIds` fields
+- `src/core/targeting.ts` — pure targeting engine: `expandPresetToRules` (TargetGroup → TargetingRules), `populationFactorFromRules` (estimate recipient fraction for simulations), `applyRulesToRecipients` (filter enrolled recipients and produce per-rule stats)
+- `POST /v1/simulate` now accepts `targetingRules` object in addition to (or replacing) `targetGroup`; when `targetingRules.preset` is set it takes precedence over the legacy field — fully backward-compatible
+- `POST /v1/pilots` now accepts and stores `targetingRules` alongside the simulation link
+- `GET /v1/pilots/:id/report` now includes a `targeting` section: `{ rules, filterStats }` showing the active rules and how many enrolled recipients each rule would filter, with per-rule notes for fields that require disbursement-time evaluation (ageRange, urbanRural, income, regionIds)
+- Full input validation for all `targetingRules` fields (preset enum, ageRange bounds, urbanRural enum, positive-number/integer checks, string-array checks)
+- Database migration: `targeting_rules TEXT` column added to the `pilots` table; existing rows unaffected (nullable)
+- **37 new tests** across 3 suites: `src/core/targeting.test.ts` (30 unit tests covering expandPresetToRules, populationFactorFromRules, applyRulesToRecipients), `src/api/simulate.test.ts` (7 integration tests for targetingRules in POST /v1/simulate), `src/api/routes/pilots.test.ts` (8 integration tests for targeting rules in pilot creation and report)
+- **Test count: 490 tests** across 27 suites
+
 ## [0.1.14] - 2026-04-13
 
 ### Added
