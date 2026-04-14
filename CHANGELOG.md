@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-04-14
+
+### Added
+- Admin UI: targeting rules support in the Simulate and Pilots pages
+- **Simulate page** (`/admin/simulate`): collapsible "Advanced targeting filters" panel below the Target group dropdown — fields for Urban/Rural, Min/Max age, Max monthly income (PPP-USD), Identity providers (comma-separated), Exclude if paid within N days, and Region IDs (comma-separated); filter values are carried through to the Save endpoint via hidden inputs
+- **Pilots create form** (`/admin/pilots`): collapsible "Targeting rules" section with all rule fields — Population group preset dropdown (bottom half / third / quintile / decile), plus the same advanced filters; targeting rules are stored on the pilot record
+- **Pilot detail page** (`/admin/pilots/:id`): new "Targeting Rules" card rendered when the pilot has rules, showing a clean summary table of each active rule
+- `parseFormTargetingRules()` helper in `routes.ts` — converts flat HTML form fields into a `TargetingRules` object; returns null if no meaningful rule is set (backward-compatible with existing pilots)
+- CSS for `.targeting-details` / `.targeting-summary` / `.targeting-fields` — animated collapsible triangle indicator
+- **Test count: 490 tests** across 27 suites (unchanged — admin UI changes are covered by existing admin test suite)
+
 ## [0.1.15] - 2026-04-14
 
 ### Added
