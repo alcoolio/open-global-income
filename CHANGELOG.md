@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.17] - 2026-04-15
+
+### Added
+- Phase 23: Evidence Layer — closes the loop between projected impact and observed outcomes
+- `OutcomeRecord`, `OutcomeIndicators`, `OutcomeCohortType`, `OutcomeComparison`, `OutcomeDelta`, `EvidenceAggregate` types in `src/core/types.ts`
+- `pilot_outcomes` database table: stores measured economic indicators per cohort per measurement date, with baseline flag, sample size, and data source provenance
+- `src/db/outcomes-db.ts` — full CRUD: `recordOutcome`, `getPilotOutcomes`, `getOutcomeById`, `getOutcomeComparison` (pre/post delta with projected vs. actual), `aggregateOutcomes` (anonymized cross-program benchmarks)
+- `POST /v1/pilots/:id/outcomes` — record a recipient or control cohort measurement with 7 indicator fields (employment rate, average monthly income, food security score, child school attendance, above-poverty-line %, self-reported health, savings rate)
+- `GET /v1/pilots/:id/outcomes` — list all outcome measurements for a pilot, ordered by date
+- `GET /v1/pilots/:id/outcomes/compare` — pre/post comparison: baseline vs. latest per indicator with numeric delta; pulls projected impact from the linked impact analysis for projected vs. actual side-by-side
+- `GET /v1/evidence/aggregate` — anonymized, aggregated outcome statistics across all pilots (filterable by country, income group, coverage range); returns median, p25, p75 per indicator — the network-effect endpoint
+- `GET /v1/evidence/export` — download aggregate evidence as CSV or JSON for academic partners; standardized column names
+- `getLatestImpactAnalysisBySimulation()` added to `src/db/impact-db.ts`
+- Admin UI: `src/admin/views/evidence.ts` — evidence page per pilot with record form, pre/post comparison table (with projected vs. actual rows when impact analysis exists), and full measurement history
+- Admin route `GET /admin/pilots/:id/evidence` and `POST /admin/pilots/:id/outcomes/create`
+- "Evidence" button added to pilot detail page linking to the evidence dashboard
+- Database migration for existing installations (safe CREATE IF NOT EXISTS)
+- **23 new tests** in `src/api/routes/outcomes.test.ts` covering all 5 endpoints, validation edge cases, and cross-cohort comparison logic
+- **Test count: 513 tests** across 28 suites
+
 ## [0.1.16] - 2026-04-14
 
 ### Added

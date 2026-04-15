@@ -28,6 +28,9 @@ import { listFundingScenarios, saveFundingScenario, deleteFundingScenario } from
 import { calculateImpactAnalysis } from '../core/impact.js';
 import { listImpactAnalyses, saveImpactAnalysis, deleteImpactAnalysis } from '../db/impact-db.js';
 import { renderDataSourcesPage, renderDataSourceDetail } from './views/data-sources.js';
+import { renderEvidencePage } from './views/evidence.js';
+import { recordOutcome, getPilotOutcomes, getOutcomeComparison } from '../db/outcomes-db.js';
+import { getLatestImpactAnalysisBySimulation } from '../db/impact-db.js';
 import { escapeHtml } from './views/helpers.js';
 import { listDataSources, getDataSourceById, createDataSource, updateDataSource, deleteDataSource, seedDefaultDataSources } from '../db/data-sources-db.js';
 import {
@@ -609,6 +612,124 @@ export const adminRoutes: FastifyPluginAsync = async (app) => {
       .type('application/json')
       .send(JSON.stringify(exportDoc, null, 2));
   });
+
+  // ── GET /admin/pilots/:id/evidence ────────────────────────────────────────
+
+  app.get<{ Params: { id: string } }>('/pilots/:id/evidence', async (request, reply) => {
+    const userId = getAuthenticatedUserId(request);
+    if (!userId) return reply.redirect('/admin/login');
+
+    const pilot = getPilotById(request.params.id);
+    if (!pilot) return reply.redirect('/admin/pilots?flash=Pilot+not+found');
+
+    const url = new URL(request.url, 'http://localhost');
+    const flash = url.searchParams.get('flash') ?? undefined;
+
+    const outcomes = getPilotOutcomes(pilot.id);
+
+    let projectedImpact: { povertyReductionPercent: number | null; incomeIncreasePercent: number | null } | null = null;
+    if (pilot.simulationId) {
+      const ia = getLatestImpactAnalysisBySimulation(pilot.simulationId);
+      if (ia) {
+        projectedImpact = {
+          povertyReductionPercent: ia.results.povertyReduction.liftedAsPercentOfPoor ?? null,
+          incomeIncreasePercent: ia.results.purchasingPower.incomeIncreasePercent ?? null,
+        };
+      }
+    }
+
+    const comparison = outcomes.length > 0 ? getOutcomeComparison(pilot.id, projectedImpact) : null;
+
+    return reply.type('text/html').send(renderEvidencePage(pilot, outcomes, comparison, flash));
+  });
+
+  // ── POST /admin/pilots/:id/outcomes/create ─────────────────────────────────
+
+  app.post<{ Params: { id: string }; Body: Record<string, string> }>(
+    '/pilots/:id/outcomes/create',
+    async (request, reply) => {
+      const userId = getAuthenticatedUserId(request);
+      if (!userId) return reply.redirect('/admin/login');
+
+      const pilot = getPilotById(request.params.id);
+      if (!pilot) return reply.redirect('/admin/pilots?flash=Pilot+not+found');
+
+      const {
+        cohortType,
+        measurementDate,
+        sampleSize,
+        dataSource,
+        isBaseline,
+        employmentRate,
+        averageMonthlyIncomeUsd,
+        foodSecurityScore,
+        childSchoolAttendanceRate,
+        abovePovertyLinePercent,
+        selfReportedHealthScore,
+        savingsRate,
+      } = request.body ?? {};
+
+      if (!['recipient', 'control'].includes(cohortType)) {
+        return reply.redirect(
+          `/admin/pilots/${pilot.id}/evidence?flash=Invalid+cohort+type`,
+        );
+      }
+      if (!measurementDate) {
+        return reply.redirect(
+          `/admin/pilots/${pilot.id}/evidence?flash=Measurement+date+required`,
+        );
+      }
+      const parsedSampleSize = parseInt(sampleSize ?? '', 10);
+      if (isNaN(parsedSampleSize) || parsedSampleSize < 1) {
+        return reply.redirect(
+          `/admin/pilots/${pilot.id}/evidence?flash=Sample+size+must+be+a+positive+integer`,
+        );
+      }
+      if (!dataSource?.trim()) {
+        return reply.redirect(
+          `/admin/pilots/${pilot.id}/evidence?flash=Data+source+required`,
+        );
+      }
+
+      // Parse optional indicators
+      function parseOptionalRate(val: string | undefined): number | null {
+        if (!val || val.trim() === '') return null;
+        const n = parseFloat(val);
+        return isNaN(n) ? null : n;
+      }
+
+      const indicators = {
+        employmentRate: parseOptionalRate(employmentRate),
+        averageMonthlyIncomeUsd: parseOptionalRate(averageMonthlyIncomeUsd),
+        foodSecurityScore: parseOptionalRate(foodSecurityScore),
+        childSchoolAttendanceRate: parseOptionalRate(childSchoolAttendanceRate),
+        abovePovertyLinePercent: parseOptionalRate(abovePovertyLinePercent),
+        selfReportedHealthScore: parseOptionalRate(selfReportedHealthScore),
+        savingsRate: parseOptionalRate(savingsRate),
+      };
+
+      const hasAny = Object.values(indicators).some((v) => v !== null);
+      if (!hasAny) {
+        return reply.redirect(
+          `/admin/pilots/${pilot.id}/evidence?flash=At+least+one+indicator+is+required`,
+        );
+      }
+
+      recordOutcome({
+        pilotId: pilot.id,
+        cohortType: cohortType as 'recipient' | 'control',
+        measurementDate,
+        indicators,
+        sampleSize: parsedSampleSize,
+        dataSource: dataSource.trim(),
+        isBaseline: isBaseline === '1',
+      });
+
+      return reply.redirect(
+        `/admin/pilots/${pilot.id}/evidence?flash=Outcome+recorded`,
+      );
+    },
+  );
 
   // ── Funding Scenario Builder ───────────────────────────────────────────────
 
