@@ -244,6 +244,22 @@ const SCHEMA = `
   CREATE INDEX IF NOT EXISTS idx_recipients_status ON recipients(status);
   CREATE INDEX IF NOT EXISTS idx_recipients_country ON recipients(country_code);
   CREATE INDEX IF NOT EXISTS idx_recipients_pilot ON recipients(pilot_id);
+
+  CREATE TABLE IF NOT EXISTS pilot_outcomes (
+    id TEXT PRIMARY KEY,
+    pilot_id TEXT NOT NULL,
+    cohort_type TEXT NOT NULL CHECK(cohort_type IN ('recipient', 'control')),
+    measurement_date TEXT NOT NULL,
+    indicators TEXT NOT NULL,
+    sample_size INTEGER NOT NULL,
+    data_source TEXT NOT NULL,
+    is_baseline INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (pilot_id) REFERENCES pilots(id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_pilot_outcomes_pilot ON pilot_outcomes(pilot_id);
+  CREATE INDEX IF NOT EXISTS idx_pilot_outcomes_date ON pilot_outcomes(measurement_date);
 `;
 
 export function getDb(dbPath?: string): Database.Database {
@@ -275,6 +291,28 @@ export function getDb(dbPath?: string): Database.Database {
     // Column already exists — OK
   }
 
+  // Migrate: create pilot_outcomes table if it doesn't exist yet (Phase 23)
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS pilot_outcomes (
+        id TEXT PRIMARY KEY,
+        pilot_id TEXT NOT NULL,
+        cohort_type TEXT NOT NULL CHECK(cohort_type IN ('recipient', 'control')),
+        measurement_date TEXT NOT NULL,
+        indicators TEXT NOT NULL,
+        sample_size INTEGER NOT NULL,
+        data_source TEXT NOT NULL,
+        is_baseline INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (pilot_id) REFERENCES pilots(id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_pilot_outcomes_pilot ON pilot_outcomes(pilot_id);
+      CREATE INDEX IF NOT EXISTS idx_pilot_outcomes_date ON pilot_outcomes(measurement_date);
+    `);
+  } catch {
+    // Table already exists — OK
+  }
+
   return db;
 }
 
@@ -296,6 +334,28 @@ export function getTestDb(): Database.Database {
     testDb.exec('ALTER TABLE pilots ADD COLUMN targeting_rules TEXT');
   } catch {
     // Column already exists — OK
+  }
+
+  // Migrate: create pilot_outcomes table if it doesn't exist yet (Phase 23)
+  try {
+    testDb.exec(`
+      CREATE TABLE IF NOT EXISTS pilot_outcomes (
+        id TEXT PRIMARY KEY,
+        pilot_id TEXT NOT NULL,
+        cohort_type TEXT NOT NULL CHECK(cohort_type IN ('recipient', 'control')),
+        measurement_date TEXT NOT NULL,
+        indicators TEXT NOT NULL,
+        sample_size INTEGER NOT NULL,
+        data_source TEXT NOT NULL,
+        is_baseline INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (pilot_id) REFERENCES pilots(id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_pilot_outcomes_pilot ON pilot_outcomes(pilot_id);
+      CREATE INDEX IF NOT EXISTS idx_pilot_outcomes_date ON pilot_outcomes(measurement_date);
+    `);
+  } catch {
+    // Table already exists — OK
   }
 
   db = testDb;

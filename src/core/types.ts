@@ -568,6 +568,100 @@ export interface IdentityProvider {
   verify(claim: IdentityClaim): Promise<VerificationResult>;
 }
 
+// ── Evidence Layer types (Phase 23) ──────────────────────────────────────────
+
+export type OutcomeCohortType = 'recipient' | 'control';
+
+/**
+ * Measured economic indicators for a cohort at a point in time.
+ * All fields are optional — programs record what they can measure.
+ */
+export interface OutcomeIndicators {
+  /** Employment rate (0–1) */
+  employmentRate?: number | null;
+  /** Average monthly income in USD */
+  averageMonthlyIncomeUsd?: number | null;
+  /** Food security score (e.g. 1–5 scale) */
+  foodSecurityScore?: number | null;
+  /** Child school attendance rate (0–1) */
+  childSchoolAttendanceRate?: number | null;
+  /** % of cohort above the extreme poverty line ($2.15/day) */
+  abovePovertyLinePercent?: number | null;
+  /** Self-reported health score (0–1) */
+  selfReportedHealthScore?: number | null;
+  /** Savings rate (0–1) */
+  savingsRate?: number | null;
+}
+
+/** A single outcome measurement for a pilot cohort at a point in time */
+export interface OutcomeRecord {
+  id: string;
+  pilotId: string;
+  cohortType: OutcomeCohortType;
+  /** ISO 8601 date of measurement */
+  measurementDate: string;
+  indicators: OutcomeIndicators;
+  sampleSize: number;
+  dataSource: string;
+  /** True if this is the baseline (pre-program) measurement */
+  isBaseline: boolean;
+  createdAt: string;
+}
+
+/** Delta between two indicator snapshots */
+export interface OutcomeDelta {
+  employmentRate?: { baseline: number | null; latest: number | null; change: number | null } | null;
+  averageMonthlyIncomeUsd?: { baseline: number | null; latest: number | null; change: number | null } | null;
+  foodSecurityScore?: { baseline: number | null; latest: number | null; change: number | null } | null;
+  childSchoolAttendanceRate?: { baseline: number | null; latest: number | null; change: number | null } | null;
+  abovePovertyLinePercent?: { baseline: number | null; latest: number | null; change: number | null } | null;
+  selfReportedHealthScore?: { baseline: number | null; latest: number | null; change: number | null } | null;
+  savingsRate?: { baseline: number | null; latest: number | null; change: number | null } | null;
+}
+
+/** Pre/post comparison result for a pilot */
+export interface OutcomeComparison {
+  pilotId: string;
+  recipient: {
+    baseline: OutcomeRecord | null;
+    latest: OutcomeRecord | null;
+    delta: OutcomeDelta | null;
+  };
+  control: {
+    baseline: OutcomeRecord | null;
+    latest: OutcomeRecord | null;
+    delta: OutcomeDelta | null;
+  } | null;
+  /** Projected impact from the linked impact analysis, if any */
+  projectedImpact: {
+    povertyReductionPercent: number | null;
+    incomeIncreasePercent: number | null;
+  } | null;
+  allMeasurements: OutcomeRecord[];
+  meta: { generatedAt: string };
+}
+
+/** Anonymized cross-program benchmark — aggregate distributions only, no program names */
+export interface EvidenceAggregate {
+  filters: {
+    country?: string;
+    incomeGroup?: string;
+    coverageMin?: number;
+    coverageMax?: number;
+  };
+  programCount: number;
+  measurementCount: number;
+  indicators: {
+    [K in keyof OutcomeIndicators]?: {
+      median: number | null;
+      p25: number | null;
+      p75: number | null;
+      sampleSize: number;
+    };
+  };
+  meta: { generatedAt: string; dataVersion: string };
+}
+
 /** Per-rule filtering statistics for the targeting rules report section */
 export interface TargetingFilterStat {
   rule: string;

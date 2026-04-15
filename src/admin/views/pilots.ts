@@ -397,6 +397,7 @@ export function renderPilotDetailPage(
 
     <div class="mt-2 flex gap-1 items-center">
       <a href="/admin/pilots">${t('pilots.backToPilots')}</a>
+      <a href="/admin/pilots/${escapeHtml(pilot.id)}/evidence" class="btn btn-secondary btn-sm">Evidence</a>
       <a href="/admin/pilots/${escapeHtml(pilot.id)}/audit-export" class="btn btn-secondary btn-sm">Export Audit Document</a>
     </div>
   `,

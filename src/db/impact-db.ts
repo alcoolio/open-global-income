@@ -85,6 +85,14 @@ export function listImpactAnalyses(
   return { analyses: rows.map(rowToAnalysis), total };
 }
 
+export function getLatestImpactAnalysisBySimulation(simulationId: string): SavedImpactAnalysis | null {
+  const db = getDb();
+  const row = db
+    .prepare('SELECT * FROM impact_analyses WHERE simulation_id = ? ORDER BY created_at DESC LIMIT 1')
+    .get(simulationId) as ImpactRow | undefined;
+  return row ? rowToAnalysis(row) : null;
+}
+
 export function getImpactAnalysisById(id: string): SavedImpactAnalysis | null {
   const db = getDb();
   const row = db

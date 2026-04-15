@@ -72,11 +72,18 @@ The funding and impact layers (Phases 14–16) are not a departure from the API 
 
 The sub-national data layer (Phase 17) brings precision where it matters most. A basic income floor in Nairobi (COL 1.35×) should not be the same local-currency amount as in rural Turkana (COL 0.68×). Regional cost-of-living indices adjust the national PPP conversion factor, and existing formulas work transparently via the "adjusted Country" pattern — zero formula changes needed.
 
-Secure admin UI with login, approval workflows, and audit trails. **490 tests** across 27 suites.
+Secure admin UI with login, approval workflows, and audit trails. **513 tests** across 28 suites.
+
+### Phase 23: Evidence Layer ✅
+
+- `POST /v1/pilots/:id/outcomes` — record recipient or control cohort measurements (employment, income, food security, school attendance, poverty, health, savings)
+- `GET /v1/pilots/:id/outcomes/compare` — pre/post comparison with numeric deltas and projected vs. actual from linked impact analysis
+- `GET /v1/evidence/aggregate` — anonymized, cross-program benchmark statistics (median, p25, p75 per indicator) — filterable by country, income group, coverage
+- `GET /v1/evidence/export` — CSV or JSON research export for academic partners
+- Admin evidence page per pilot: record form, comparison table, full measurement history
 
 ### 🔜 Next
 
-- **Evidence layer** — outcome metrics, pre/post analysis, control groups, research-grade exports. Programs live or die on evidence, and this is the layer that closes the loop between "we projected X impact" and "here's what actually happened."
 - **More countries** — sub-national data now covers Kenya (47 counties), Germany (16 Bundesländer), France (13 regions), and Netherlands (12 provinces). Next priority: Tanzania, Uganda, Ghana, Nigeria, India. The region data format and loader are country-agnostic; each country needs a curated `regions.json` entry with cost-of-living indices sourced from national statistics bureaus.
 
 ### 🌐 Future
@@ -460,7 +467,7 @@ See [GOVERNANCE.md](./GOVERNANCE.md) for the decision-making process, API stabil
 
 ## 📋 Current Status
 
-**Version 0.1.13** — Ten phases complete (simulation, disbursement, pilots, macro-economic data, funding, impact, sub-national data, EU payment rails & regions, recipient model, inbound webhooks). 448 tests across 26 suites. The platform covers the full workflow from "how much per person?" through "where does the money come from?" to "what happens to poverty?" — with regional precision, SEPA bank wire support for western Europe, individual recipient enrollment with cross-program duplicate detection, and inbound payment confirmation webhooks with HMAC verification and replay protection. Docker deployment is production-ready with data persistence, health checks, and enforced credentials.
+**Version 0.1.17** — Phase 23 complete. 513 tests across 28 suites. The platform now covers the full workflow from "how much per person?" through "where does the money come from?" to "did it work?" — with the Evidence Layer closing the loop between projected impact and observed outcomes. Includes outcome recording, pre/post comparison with projected-vs-actual, anonymized cross-program benchmarks, and research-grade CSV/JSON exports. Also includes regional precision, SEPA bank wire support, recipient enrollment with cross-program duplicate detection, and inbound webhooks.
 
 See [CHANGELOG.md](./CHANGELOG.md) for full version history.
 
