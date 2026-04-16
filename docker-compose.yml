@@ -16,6 +16,7 @@ services:
       - API_KEY_REQUIRED=${API_KEY_REQUIRED:-false}
       - ADMIN_USERNAME=${ADMIN_USERNAME:?ADMIN_USERNAME must be set}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:?ADMIN_PASSWORD must be set}
+      - ENABLE_ADMIN=${ENABLE_ADMIN:-true}
       - ENABLE_METRICS=${ENABLE_METRICS:-true}
       - ENABLE_AUDIT_LOG=${ENABLE_AUDIT_LOG:-true}
     healthcheck:
