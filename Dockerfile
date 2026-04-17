@@ -16,6 +16,7 @@ RUN npm pkg delete scripts.postinstall && npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY src/data/countries.json ./dist/data/countries.json
 COPY src/data/regions.json ./dist/data/regions.json
+COPY src/data/fx-rates.json ./dist/data/fx-rates.json
 COPY public ./public
 EXPOSE 3333
 CMD ["node", "dist/index.js"]

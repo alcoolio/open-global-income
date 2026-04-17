@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.26] - 2026-04-17
+
+### Fixed
+- Docker runtime failed with `ENOENT` when `getFxSnapshot()` tried to read `dist/data/fx-rates.json`, causing `/admin/countries/:code` to return a 500 in production. `tsc` does not copy non-TS files, and the Dockerfile only had explicit `COPY` lines for `countries.json` and `regions.json`. Added the missing `COPY src/data/fx-rates.json ./dist/data/fx-rates.json` line so the FX snapshot introduced in 0.1.25 ships in the runtime image.
+
 ## [0.1.25] - 2026-04-17
 
 ### Fixed
